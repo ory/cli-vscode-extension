@@ -1,7 +1,7 @@
 {
   "name": "ory",
   "displayName": "ory",
-  "description": "This extension enables Visual Studio Code to use the Ory CLI to interact with your  Ory projects and services.",
+  "description": "This extension enables Visual Studio Code to use the Ory CLI to interact with your Ory projects and services.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.77.0"
@@ -16,6 +16,10 @@
       {
         "command": "ory.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "ory.version",
+        "title": "Ory Version"
       }
     ]
   },
