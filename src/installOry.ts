@@ -164,7 +164,7 @@ async function installOryCli() {
         });
       break;
     default:
-      console.warn('Not able to recoginize the OS!!!');
+      console.warn('Not able to recognize the OS!');
       outputChannel.appendLine('Not able to recoginize the OS!!!');
       break;
   }
