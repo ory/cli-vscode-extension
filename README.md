@@ -29,7 +29,33 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+### Node-pty Issue
+
+Please check the dependency of [Node-Pty](https://github.com/microsoft/node-pty#dependencies) if you're getting any errors regarding node-pty after or while performing `npm install`.
+
+#### Linux Solution
+
+On Linux, if you're on the latest version of NodeJS and still getting errors from Node-Pty, try NodeJs v16 (you can use [nvm](https://github.com/nvm-sh/nvm)) it may resolve your problem. or you can build a package (node-pty) for your NodeJs version using this command.
+
+```
+./node_modules/.bin/electron-rebuild -f -w node-pty --version <electron-version>
+```
+
+`<electron-version>` can be whatever version your VSCode is using below one. (Vscode > help > about > Electron version)
+
+#### Windows Solution
+
+On Windows, you will have to first install all the dependencies for [node-pty](https://github.com/microsoft/node-pty#windows).
+
+It is similar to Linux; here we have to build the package again after `npm install`.
+
+```
+node_modules\.bin\electron-rebuild.cmd -f -w node-pty --version <electron-version>
+```
+
+`<electron-version>` can be whatever version your VSCode is using below one. (Vscode > help > about > Electron version)
+
+In some cases, you will see `node-pty\Debug\conpty...` not found. You will have to add the `--debug` flag to the above command. It will create a debug folder and remove the release folder. The best way is to make a copy of the `Release` folder and rename it to `Debug` so it will work in both cases.
 
 ## Release Notes
 

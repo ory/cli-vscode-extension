@@ -30,6 +30,14 @@
       {
         "command": "ory.activate",
         "title": "Ory: Activate"
+      },
+      {
+        "command": "ory.auth",
+        "title": "Ory: Auth"
+      },
+      {
+        "command": "ory.auth.logout",
+        "title": "Ory: Logout"
       }
     ]
   },
@@ -46,6 +54,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" --config ./.prettierrc"
   },
   "devDependencies": {
+    "@electron/rebuild": "^3.2.13",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
@@ -61,5 +70,9 @@
     "typescript": "^4.9.5",
     "webpack": "^5.76.3",
     "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "node-pty": "^0.10.1",
+    "strip-ansi": "^7.0.1"
   }
 }
