@@ -5,6 +5,7 @@ import { exec } from 'child_process';
 import { offerToInstallOry } from './installOry';
 import { runOryAuth, runOryAuthLogout } from './oryAuth';
 import { runOryGet } from './oryGet';
+import { runOryCreate } from './oryCreate';
 
 export const outputChannel = vscode.window.createOutputChannel('Ory');
 // This method is called when your extension is activated
@@ -40,6 +41,9 @@ export async function activate(context: vscode.ExtensionContext) {
   let disposableOryGet = vscode.commands.registerCommand('ory.get', () => {
     runOryGet();
   });
+  let disposableOryCreate = vscode.commands.registerCommand('ory.create', () => {
+    runOryCreate();
+  });
   context.subscriptions.push(
     disposableHelloWorld,
     disposableOryVersion,
@@ -47,7 +51,8 @@ export async function activate(context: vscode.ExtensionContext) {
     disposableOryInstall,
     disposableOryAuth,
     disposableOryAuthLogout,
-    disposableOryGet
+    disposableOryGet,
+    disposableOryCreate
   );
 }
 

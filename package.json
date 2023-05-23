@@ -42,6 +42,10 @@
       {
         "command": "ory.get",
         "title": "Ory: Get"
+      },
+      {
+        "command": "ory.create",
+        "title": "Ory: Create"
       }
     ]
   },
