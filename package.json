@@ -38,6 +38,10 @@
       {
         "command": "ory.auth.logout",
         "title": "Ory: Logout"
+      },
+      {
+        "command": "ory.get",
+        "title": "Ory: Get"
       }
     ]
   },
