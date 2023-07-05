@@ -13,7 +13,7 @@ export async function runOryCreate() {
       { label: 'project', description: 'Create a new Ory Network project' },
       { label: 'relationships', description: 'Create relation tuples from JSON files' }
     ],
-    { placeHolder: 'Pick to create...', title: 'Ory Create' }
+    { placeHolder: 'Pick to create...', title: 'Ory Create', ignoreFocusOut: true }
   );
 
   switch (result?.label) {
@@ -21,7 +21,8 @@ export async function runOryCreate() {
       console.log(`Got: jwk`);
       const jwkSetInput = await vscode.window.showInputBox({
         title: 'JWK Set ID',
-        placeHolder: '<my-jwk-set>'
+        placeHolder: '<my-jwk-set>',
+        ignoreFocusOut: true
       });
 
       if (jwkSetInput === undefined) {
@@ -103,7 +104,7 @@ export async function runOryCreate() {
               selection.command();
             }
           });
-          createProject.kill();
+          createJWK.kill();
         }
       });
 
@@ -191,7 +192,7 @@ export async function runOryCreate() {
               selection.command();
             }
           });
-          createProject.kill();
+          createOauth2Client.kill();
         } else {
           vscode.window.showErrorMessage('Opps 🫢 something went wrong! Please check in Output -> Ory');
         }
@@ -206,7 +207,8 @@ export async function runOryCreate() {
       console.log('Got: project');
       const projectNameInput = await vscode.window.showInputBox({
         title: 'Project Name',
-        placeHolder: 'Enter ory project name'
+        placeHolder: 'Enter ory project name',
+        ignoreFocusOut: true
       });
 
       if (projectNameInput === undefined) {
@@ -269,7 +271,51 @@ export async function runOryCreate() {
     // TODO: Implementation of ory create relationships command is pending for vscode
     case 'relationships':
       console.log(`Got: relationships`);
-      vscode.window.showInformationMessage('Under Development 🧰');
+      const relationshipConfigFileInput = await vscode.window.showOpenDialog({
+        title: 'Ory Create Relationships',
+        canSelectMany: false,
+        filters: { "json": ['json']}
+      });
+
+      if (relationshipConfigFileInput === undefined) {
+        vscode.window.showErrorMessage(`Invalid project name ${relationshipConfigFileInput}`);
+        return;
+      }
+      console.log(relationshipConfigFileInput[0].fsPath);
+      const createRelationships = spawn(oryCommand, ['create', 'relationships', `${relationshipConfigFileInput[0].fsPath}`]);
+
+      createRelationships.stdout.on('data', (data) => {
+        outputChannel.append('\n' + String(data));
+        console.log(`stdout: ${data}`);
+        if (data.includes(`NAMESPACE`)) {
+          vscode.window.showInformationMessage(`Relationship created successfully!`);
+        }
+      });
+
+      createRelationships.stderr.on('data', (data) => {
+        outputChannel.append('\n' + String(data));
+        console.error(`stderr: ${data}`);
+        if (data.includes('Your session has expired or has otherwise become invalid')) {
+          const reAuthenticate = {
+            title: 'Re-authenticate',
+            command() {
+              vscode.commands.executeCommand('ory.auth');
+            }
+          };
+          vscode.window.showErrorMessage(`${data}`, reAuthenticate).then((selection) => {
+            if (selection) {
+              selection.command();
+            }
+          });
+          createRelationships.kill();
+        }
+        vscode.window.showErrorMessage('Oops something went wrong!');
+      });
+
+      createRelationships.on('close', (code) => {
+        outputChannel.append(`\nprocess exited with code ${code}`);
+        console.log(`child process exited with code ${code}`);
+      });
       break;
     default:
       break;
@@ -436,7 +482,6 @@ async function oauth2Client(): Promise<string[]> {
   console.log('Flag values: ' + flagsValue);
   let stringBuilder: string[] = [];
   flagsValue.forEach((value: string, key: string) => {
-    // stringBuilder += '--' + key + '=' + value + ' ';
     stringBuilder.push('--' + key + '=' + value);
   });
 
@@ -457,7 +502,8 @@ async function getOauth2FlagsInput(obj: {
         : obj.type === 'boolean'
         ? 'Enter true or false'
         : 'Enter multiple inputs "," (comma-separated). ex- cat, dog',
-    prompt: obj.description
+    prompt: obj.description,
+    ignoreFocusOut: true
   });
 
   if (flagInput === undefined) {
