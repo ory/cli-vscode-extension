@@ -30,6 +30,11 @@
           "command": "ory.oauth2clients.refresh",
           "when": "view == listOauth2Clients",
           "group": "navigation@1"
+        },
+        {
+          "command": "ory.relationships.refresh",
+          "when": "view == listRelationships",
+          "group": "navigation@1"
         }
       ],
       "view/item/context": [
@@ -179,6 +184,11 @@
       },
       {
         "command": "ory.oauth2clients.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "ory.relationships.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
       },

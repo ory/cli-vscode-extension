@@ -68,12 +68,12 @@ export class ListOauth2ClientsProvider implements vscode.TreeDataProvider<Oauth2
 
 export class Oauth2ClientsTreeItem extends vscode.TreeItem {
   private readonly _item: Oauth2Clients;
-  constructor(public readonly identity: Oauth2Clients) {
-    super(identity.name !== '' ? identity.name : identity.clientID, vscode.TreeItemCollapsibleState.None);
+  constructor(public readonly oauth2: Oauth2Clients) {
+    super(oauth2.name !== '' ? oauth2.name : oauth2.clientID, vscode.TreeItemCollapsibleState.None);
 
-    this.tooltip = `ClientID: ${identity.clientID}\nClientSecret: ${identity.clientSecret}\nGrant Types: ${identity.grantTypes}\nScope: ${identity.scope}\nAudience: ${identity.audience}\nRedirect URIS: ${identity.redirectUris}\nResponse Type: ${identity.responseType}`;
-    this.iconPath = this.getIconPath(identity.clientID);
-    this._item = this.identity;
+    this.tooltip = `ClientID: ${oauth2.clientID}\nClientSecret: ${oauth2.clientSecret}\nGrant Types: ${oauth2.grantTypes}\nScope: ${oauth2.scope}\nAudience: ${oauth2.audience}\nRedirect URIS: ${oauth2.redirectUris}\nResponse Type: ${oauth2.responseType}`;
+    this.iconPath = this.getIconPath(oauth2.clientID);
+    this._item = this.oauth2;
   }
 
   private getIconPath(clientID: string): vscode.ThemeIcon | undefined {
