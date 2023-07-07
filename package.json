@@ -94,7 +94,7 @@
       "activitybar": [
         {
           "id": "ory-explorer",
-          "title": "Ory Explorer",
+          "title": "Ory",
           "icon": "resource/ory.svg"
         }
       ]
