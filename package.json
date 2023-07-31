@@ -14,6 +14,111 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "menus": {
+      "view/title": [
+        {
+          "command": "ory.projects.refresh",
+          "when": "view == listProjects",
+          "group": "navigation@1"
+        },
+        {
+          "command": "ory.identities.refresh",
+          "when": "view == listIdentities",
+          "group": "navigation@1"
+        },
+        {
+          "command": "ory.oauth2clients.refresh",
+          "when": "view == listOauth2Clients",
+          "group": "navigation@1"
+        },
+        {
+          "command": "ory.relationships.refresh",
+          "when": "view == listRelationships",
+          "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "ory.use.project",
+          "when": "view == listProjects",
+          "group": "projects_1_general@1"
+        },
+        {
+          "command": "ory.copy.projectId",
+          "when": "view == listProjects",
+          "group": "projects_1_general@2"
+        },
+        {
+          "command": "ory.get.projectConfig",
+          "when": "view == listProjects",
+          "group": "projects_1_general@3"
+        },
+        {
+          "command": "ory.get.identityConfig",
+          "when": "view == listProjects",
+          "group": "projects_1_general@4"
+        },
+        {
+          "command": "ory.get.oauth2Config",
+          "when": "view == listProjects",
+          "group": "projects_1_general@5"
+        },
+        {
+          "command": "ory.get.permissionConfig",
+          "when": "view == listProjects",
+          "group": "projects_1_general@6"
+        },
+        {
+          "command": "ory.get.oauth2Client",
+          "when": "view == listOauth2Clients",
+          "group": "oauth2Clients_1_general@1"
+        },
+        {
+          "command": "ory.copy.oauth2ClientID",
+          "when": "view == listOauth2Clients",
+          "group": "oauth2Clients_1_general@2"
+        },
+        {
+          "command": "ory.get.identity",
+          "when": "view == listIdentities",
+          "group": "identities_1_general@1"
+        },
+        {
+          "command": "ory.copy.identityID",
+          "when": "view == listIdentities",
+          "group": "identities_1_general@2"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ory-explorer",
+          "title": "Ory",
+          "icon": "resource/ory.svg"
+        }
+      ]
+    },
+    "views": {
+      "ory-explorer": [
+        {
+          "id": "listProjects",
+          "name": "Projects"
+        },
+        {
+          "id": "listIdentities",
+          "name": "Identities"
+        },
+        {
+          "id": "listOauth2Clients",
+          "name": "Oauth2-Clients"
+        },
+        {
+          "id": "listRelationships",
+          "name": "Relationships"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "ory.helloWorld",
@@ -42,6 +147,70 @@
       {
         "command": "ory.get",
         "title": "Ory: Get"
+      },
+      {
+        "command": "ory.get.projectConfig",
+        "title": "Get Project Config"
+      },
+      {
+        "command": "ory.get.identityConfig",
+        "title": "Get Identity Config"
+      },
+      {
+        "command": "ory.get.oauth2Config",
+        "title": "Get Oauth2 Config"
+      },
+      {
+        "command": "ory.get.permissionConfig",
+        "title": "Get Permission Config"
+      },
+      {
+        "command": "ory.get.oauth2Client",
+        "title": "Get Client"
+      },
+      {
+        "command": "ory.get.identity",
+        "title": "Get Identity"
+      },
+      {
+        "command": "ory.projects.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "ory.identities.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "ory.oauth2clients.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "ory.relationships.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "ory.use",
+        "title": "Ory: Use"
+      },
+      {
+        "command": "ory.use.project",
+        "title": "Use Project"
+      },
+      {
+        "command": "ory.copy.projectId",
+        "title": "Copy ID"
+      },
+      {
+        "command": "ory.copy.oauth2ClientID",
+        "title": "Copy Client ID"
+      },
+      {
+        "command": "ory.copy.identityID",
+        "title": "Copy ID"
       },
       {
         "command": "ory.create",
