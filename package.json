@@ -211,6 +211,10 @@
       {
         "command": "ory.copy.identityID",
         "title": "Copy ID"
+      },
+      {
+        "command": "ory.create",
+        "title": "Ory: Create"
       }
     ]
   },

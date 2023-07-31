@@ -20,6 +20,7 @@ import { runOryUse, runOryUseProject } from './oryUse';
 import { IdentitiesTreeItem, ListIdentitiesProvider } from './tree/listIdentities';
 import { ListOauth2ClientsProvider, Oauth2ClientsTreeItem } from './tree/listOauth2Clients';
 import { ListRelationshipsProvider } from './tree/listRelationships';
+import { runOryCreate } from './oryCreate';
 
 export const outputChannel = vscode.window.createOutputChannel('Ory');
 
@@ -75,6 +76,7 @@ export async function activate(context: vscode.ExtensionContext) {
   registerCommand('ory.promptforinstall', () => offerToInstallOry(), context);
   registerCommand('ory.auth', () => runOryAuth(), context);
   registerCommand('ory.auth.logout', () => runOryAuthLogout(), context);
+  registerCommand('ory.create', () => runOryCreate(), context);
   registerCommand('ory.use', () => runOryUse(), context);
   registerCommand(
     'ory.use.project',
