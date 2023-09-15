@@ -79,15 +79,21 @@ export function webViewPanel(viewType: string, title: string, showOptions: vscod
   panel.webview.html = htmlContent;
 }
 
-export async function commandInput(obj: { label: string; description: string; type: string }): Promise<string[]> {
+export async function commandInput(obj: { label: string; description: string; type: string; useLabelPlaceHolder?: boolean; }): Promise<string[]> {
   let resultString: string[] = [];
-  let input = await vscode.window.showInputBox({
-    title: obj.label,
-    placeHolder:
-      obj.type === 'string' ? 'Enter project id' : 'Enter multiple inputs "," (comma-separated). ex- id-1, id-2',
-    prompt: obj.description,
-    ignoreFocusOut: true
-  });
+  let input: string | undefined;
+  if (obj.type === 'empty') {
+    input = '';
+  } else {
+    let placeHolder = obj.useLabelPlaceHolder ? obj.label : 'Project ID';
+    input = await vscode.window.showInputBox({
+      title: obj.label,
+      placeHolder:
+        obj.type === 'string' ? `Enter ${placeHolder}` : 'Enter multiple inputs "," (comma-separated). ex- id-1, id-2',
+      prompt: obj.description,
+      ignoreFocusOut: true
+    });
+  }
 
   if (input === undefined) {
     throw new Error('Invalid input');

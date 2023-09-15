@@ -75,18 +75,8 @@ export async function runOryDelete() {
 
       break;
     case 'relationships':
-      let relationshipsCmdOutput: string[] = [];
 
-      try {
-        relationshipsCmdOutput = await commandInput(result);
-        console.log(relationshipsCmdOutput);
-      } catch (err: any) {
-        console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
-        return;
-      }
-
-      oryDeleteRelationships(relationshipsCmdOutput);
+      oryDeleteRelationships();
 
       break;
   }
@@ -134,14 +124,115 @@ export async function oryDeleteOauth2Client(oauth2ClientCmdOutput: string[]): Pr
   return result;
 }
 
-export async function oryDeleteRelationships(relationshipsCmdOutput: string[]) {
-  const deleteRelationships = spawn(oryCommand, [
-    'delete',
-    'relationships',
-    ...relationshipsCmdOutput,
-    '--format',
-    'json'
-  ]);
+export async function oryDeleteRelationships() {
+  const flags = [
+    {
+      label: 'all',
+      description: 'Delete all relation tuples',
+      type: 'empty',
+      useLabelPlaceHolder: true
+    },
+    {
+      label: 'force',
+      description: 'Force the deletion of relation tuples',
+      type: 'empty'
+    },
+    {
+      label: 'namespace',
+      description: 'Set the requested namespace',
+      type: 'string',
+      useLabelPlaceHolder: true
+    },
+    {
+      label: 'object',
+      description: 'Set the requested object',
+      type: 'string',
+      useLabelPlaceHolder: true
+    },
+    {
+      label: 'relation',
+      description: 'Set the requested relation',
+      type: 'string',
+      useLabelPlaceHolder: true
+    },
+    {
+      label: 'subject-id',
+      description: 'Set the requested subject ID',
+      type: 'string',
+      useLabelPlaceHolder: true
+    },
+    {
+      label: 'subject-set',
+      description: 'Set the requested subject set; format: "namespace:object#relation"',
+      type: 'string',
+      useLabelPlaceHolder: true
+    }
+  ];
 
-  await spawnCommonErrAndClose(deleteRelationships, 'relationships', '');
+  const result = await vscode.window.showQuickPick([...flags], {
+    placeHolder: 'Pick to flags...',
+    title: 'Delete Relationships',
+    canPickMany: true
+  });
+
+  if (result === undefined) {
+    return [];
+  }
+
+  const flagsValue: Map<string, string> = new Map();
+
+  for (let i = 0; i < result?.length; ) {
+    let errorBool: Boolean = false;
+    await commandInput(result[i])
+      .then((value) => {
+        if (value === undefined) {
+          return;
+        }
+        flagsValue.set(result[i].label, value[0]);
+        i++;
+      })
+      .catch((e) => {
+        console.log('from relationships err: ', e);
+        errorBool = true;
+        return;
+      });
+
+    if (errorBool === true) {
+      return [];
+    }
+  }
+
+  console.log('Flag values: ' + flagsValue);
+  let stringBuilder: string[] = [];
+  flagsValue.forEach((value: string, key: string) => {
+    if (key === 'all' || key === 'force' ) {
+      stringBuilder.push('--' + key);
+    } else {
+      stringBuilder.push('--' + key + '=' + value);
+    }
+  });
+
+  const deleteRelationships = spawn(oryCommand, ['delete', 'relationships', ...stringBuilder]);
+
+  const rsp = await spawnCommonErrAndClose(deleteRelationships, 'relationships', '');
+  if(rsp.includes("WARNING")){
+    let warnData = rsp.trim().split('\n');
+    const viewDetails = {
+      title: 'View Details',
+      details() {
+        let processString = rsp;
+        processString.replace('\t','\t\t');
+        vscode.window.showInformationMessage('Warning: ', {
+          modal: true,
+          detail: `${processString}`
+        });
+      }
+    };
+    vscode.window.showWarningMessage(warnData[0]+' '+ warnData[1], viewDetails).then((selection) => {
+      if (selection) {
+        selection.details();
+      }
+    });
+  }
+  console.log(rsp);
 }
