@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
-import { spwanCommonErrAndClose } from '../helper';
+import { spawnCommonErrAndClose } from '../helper';
+import { oryDeleteOauth2Client } from '../oryDelete';
 
 export interface Oauth2Clients {
   clientID: string;
@@ -64,6 +65,17 @@ export class ListOauth2ClientsProvider implements vscode.TreeDataProvider<Oauth2
     }
     return [];
   }
+
+  async delete(id: string) {
+    const val = await oryDeleteOauth2Client([id]);
+    if(val.includes(id)){
+      const index = this.topLevelItems.findIndex((item) => item.clientID === id);
+      if (index !== -1) {
+        this.topLevelItems.splice(index, 1);
+        this._onDidChangeTreeData.fire();
+      }
+    }
+  }
 }
 
 export class Oauth2ClientsTreeItem extends vscode.TreeItem {
@@ -74,6 +86,7 @@ export class Oauth2ClientsTreeItem extends vscode.TreeItem {
     this.tooltip = `ClientID: ${oauth2.clientID}\nClientSecret: ${oauth2.clientSecret}\nGrant Types: ${oauth2.grantTypes}\nScope: ${oauth2.scope}\nAudience: ${oauth2.audience}\nRedirect URIS: ${oauth2.redirectUris}\nResponse Type: ${oauth2.responseType}`;
     this.iconPath = this.getIconPath(oauth2.clientID);
     this._item = this.oauth2;
+    this.contextValue = "oauth2Clients";
   }
 
   private getIconPath(clientID: string): vscode.ThemeIcon | undefined {
@@ -103,7 +116,7 @@ export async function runOryListOauth2Clients(): Promise<any> {
   let json: any;
 
   const listOauth2Clients = spawn(oryCommand, ['list', 'oauth2-clients', '--format', `${oauth2ClientsOutputFormat}`]);
-  await spwanCommonErrAndClose(listOauth2Clients, 'Oauth2Clients').then((value) => {
+  await spawnCommonErrAndClose(listOauth2Clients, 'Oauth2Clients').then((value) => {
     json = JSON.parse(value);
   });
   return json;
