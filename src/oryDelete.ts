@@ -221,7 +221,7 @@ export async function oryDeleteRelationships() {
       title: 'View Details',
       details() {
         let processString = rsp;
-        processString.replace('\t','\t\t');
+        processString = processString.replace(/\t(?!\n)/g," |  ");
         vscode.window.showInformationMessage('Warning: ', {
           modal: true,
           detail: `${processString}`
