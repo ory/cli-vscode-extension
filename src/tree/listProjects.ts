@@ -66,7 +66,7 @@ export class ProjectsTreeItem extends vscode.TreeItem {
     this.tooltip = `ID: ${project.id}\nSlug: ${project.slug}\nState: ${project.state}`;
     this.iconPath = this.getIconPath(project.state);
     this._item = this.project;
-    this.contextValue = "project";
+    this.contextValue = 'project';
   }
 
   public get pId(): string {

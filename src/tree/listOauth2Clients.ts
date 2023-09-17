@@ -68,7 +68,7 @@ export class ListOauth2ClientsProvider implements vscode.TreeDataProvider<Oauth2
 
   async delete(id: string) {
     const val = await oryDeleteOauth2Client([id]);
-    if(val.includes(id)){
+    if (val.includes(id)) {
       const index = this.topLevelItems.findIndex((item) => item.clientID === id);
       if (index !== -1) {
         this.topLevelItems.splice(index, 1);
@@ -86,7 +86,7 @@ export class Oauth2ClientsTreeItem extends vscode.TreeItem {
     this.tooltip = `ClientID: ${oauth2.clientID}\nClientSecret: ${oauth2.clientSecret}\nGrant Types: ${oauth2.grantTypes}\nScope: ${oauth2.scope}\nAudience: ${oauth2.audience}\nRedirect URIS: ${oauth2.redirectUris}\nResponse Type: ${oauth2.responseType}`;
     this.iconPath = this.getIconPath(oauth2.clientID);
     this._item = this.oauth2;
-    this.contextValue = "oauth2Clients";
+    this.contextValue = 'oauth2Clients';
   }
 
   private getIconPath(clientID: string): vscode.ThemeIcon | undefined {

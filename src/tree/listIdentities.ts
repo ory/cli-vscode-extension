@@ -64,7 +64,7 @@ export class ListIdentitiesProvider implements vscode.TreeDataProvider<Identitie
 
   async delete(id: string) {
     const val = await oryDeleteIdentity([id]);
-    if(val.includes(id)){
+    if (val.includes(id)) {
       const index = this.topLevelItems.findIndex((item) => item.iId === id);
       if (index !== -1) {
         this.topLevelItems.splice(index, 1);
@@ -82,14 +82,14 @@ export class IdentitiesTreeItem extends vscode.TreeItem {
     this.tooltip = `ID: ${identity.id}\nState: ${identity.state}\nTraits: ${identity.traits}\nSchema ID: ${identity.schemaId}\nSchema URL: ${identity.schemaUrl}`;
     this.iconPath = this.getIconPath(identity.state);
     this._item = this.identity;
-    this.contextValue = "identity";
+    this.contextValue = 'identity';
   }
 
   public get iId(): string {
     return this._item.id;
   }
 
-   public get iSchemaID(): string {
+  public get iSchemaID(): string {
     return this._item.schemaId;
   }
 

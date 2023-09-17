@@ -129,7 +129,7 @@ export class RelationshipsTreeItem extends vscode.TreeItem {
     this.tooltip = tooltip ? tooltip : subject;
     this.iconPath = new vscode.ThemeIcon('references', color);
     this.children = [];
-    this.contextValue = "relationships";
+    this.contextValue = 'relationships';
   }
 
   getChildren(): RelationshipsTreeItem[] {

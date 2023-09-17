@@ -75,7 +75,6 @@ export async function runOryDelete() {
 
       break;
     case 'relationships':
-
       oryDeleteRelationships();
 
       break;
@@ -205,7 +204,7 @@ export async function oryDeleteRelationships() {
   console.log('Flag values: ' + flagsValue);
   let stringBuilder: string[] = [];
   flagsValue.forEach((value: string, key: string) => {
-    if (key === 'all' || key === 'force' ) {
+    if (key === 'all' || key === 'force') {
       stringBuilder.push('--' + key);
     } else {
       stringBuilder.push('--' + key + '=' + value);
@@ -215,20 +214,20 @@ export async function oryDeleteRelationships() {
   const deleteRelationships = spawn(oryCommand, ['delete', 'relationships', ...stringBuilder]);
 
   const rsp = await spawnCommonErrAndClose(deleteRelationships, 'relationships', '');
-  if(rsp.includes("WARNING")){
+  if (rsp.includes('WARNING')) {
     let warnData = rsp.trim().split('\n');
     const viewDetails = {
       title: 'View Details',
       details() {
         let processString = rsp;
-        processString = processString.replace(/\t(?!\n)/g," |  ");
+        processString = processString.replace(/\t(?!\n)/g, ' |  ');
         vscode.window.showInformationMessage('Warning: ', {
           modal: true,
           detail: `${processString}`
         });
       }
     };
-    vscode.window.showWarningMessage(warnData[0]+' '+ warnData[1], viewDetails).then((selection) => {
+    vscode.window.showWarningMessage(warnData[0] + ' ' + warnData[1], viewDetails).then((selection) => {
       if (selection) {
         selection.details();
       }

@@ -189,7 +189,7 @@ function oryAuthHelper(
     }
   });
 
-  // Any Errors 
+  // Any Errors
   ptyProcess.onExit((e: any) => {
     outputChannel.append(e);
     console.error(e);
@@ -203,7 +203,7 @@ export async function runOryAuthLogout() {
   ls.stdout.on('data', (data) => {
     outputChannel.append('\n' + String(data));
     console.log(`stdout: ${data}`);
-    vscode.window.showInformationMessage("You signed out successfully ☹️");
+    vscode.window.showInformationMessage('You signed out successfully ☹️');
   });
 
   ls.stderr.on('data', (data) => {

@@ -208,18 +208,26 @@ export async function activate(context: vscode.ExtensionContext) {
     context
   );
   registerCommand('ory.delete', () => runOryDelete(), context);
-  registerCommand('ory.delete.identity',async (node?:IdentitiesTreeItem) => { 
-    console.log(node?.iId);
-    if (node !== undefined) {
-      listIdentitiesProvider.delete(node.iId);
-    }
-  }, context);
-  registerCommand('ory.delete.oauth2Client',async (node?:Oauth2ClientsTreeItem) => { 
-    console.log(node?.clientID);
-    if (node !== undefined) {
-      listOauth2ClientsProvider.delete(node.clientID);
-    }
-  }, context);
+  registerCommand(
+    'ory.delete.identity',
+    async (node?: IdentitiesTreeItem) => {
+      console.log(node?.iId);
+      if (node !== undefined) {
+        listIdentitiesProvider.delete(node.iId);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.delete.oauth2Client',
+    async (node?: Oauth2ClientsTreeItem) => {
+      console.log(node?.clientID);
+      if (node !== undefined) {
+        listOauth2ClientsProvider.delete(node.clientID);
+      }
+    },
+    context
+  );
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
 }
 
