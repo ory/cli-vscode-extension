@@ -21,6 +21,7 @@ import { IdentitiesTreeItem, ListIdentitiesProvider } from './tree/listIdentitie
 import { ListOauth2ClientsProvider, Oauth2ClientsTreeItem } from './tree/listOauth2Clients';
 import { ListRelationshipsProvider } from './tree/listRelationships';
 import { runOryCreate } from './oryCreate';
+import { runOryUpdate } from './oryUpdate';
 
 export const outputChannel = vscode.window.createOutputChannel('Ory');
 
@@ -61,14 +62,14 @@ export async function activate(context: vscode.ExtensionContext) {
     treeDataProvider: listOauth2ClientsProvider
   });
 
-    // Oauth2-Clients List
-    const listRelationshipsProvider = new ListRelationshipsProvider();
-    vscode.window.registerTreeDataProvider('listRelationships', listRelationshipsProvider);
-    registerCommand('ory.relationships.refresh', () => listRelationshipsProvider.refresh(), context);
-    const relationshipsView = vscode.window.createTreeView('listRelationships', {
-      treeDataProvider: listRelationshipsProvider,
-      showCollapseAll: true
-    });
+  // Oauth2-Clients List
+  const listRelationshipsProvider = new ListRelationshipsProvider();
+  vscode.window.registerTreeDataProvider('listRelationships', listRelationshipsProvider);
+  registerCommand('ory.relationships.refresh', () => listRelationshipsProvider.refresh(), context);
+  const relationshipsView = vscode.window.createTreeView('listRelationships', {
+    treeDataProvider: listRelationshipsProvider,
+    showCollapseAll: true
+  });
 
   registerCommand('ory.helloWorld', () => vscode.window.showInformationMessage('Hello World from ory!'), context);
   registerCommand('ory.version', () => runOryVersion(), context);
@@ -194,6 +195,7 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+  registerCommand('ory.update', () => runOryUpdate(), context);
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
 }
 

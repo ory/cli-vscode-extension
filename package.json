@@ -215,6 +215,10 @@
       {
         "command": "ory.create",
         "title": "Ory: Create"
+      },
+      {
+        "command": "ory.update",
+        "title": "Ory: Update"
       }
     ]
   },
