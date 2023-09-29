@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { outputChannel, oryCommand } from './extension';
 import { format, spwanCommonErrAndClose } from './helper';
+import { oauth2Client } from './oryCreate';
 
 export async function runOryUpdate() {
   const result = await vscode.window.showQuickPick(
@@ -31,6 +32,9 @@ export async function runOryUpdate() {
   switch (result?.label) {
     case 'identity-config':
       const projectId = await commandInput(result);
+      if (projectId.length === 0) {
+        return;
+      }
       await oryUpdateIdentityConfig(projectId);
       break;
   }
@@ -81,6 +85,19 @@ async function oryUpdateIdentityConfig(projectId: string[]) {
   return;
 }
 
+async function updateOAuth2Client(oauthClientID: string) {
+  let oauth2ClientOptions: string[] = [];
+  await oauth2Client().then((value) => {
+    if (value.length === 0) {
+      // vscode.window.showInformationMessage('creating oauth2-client with default values.');
+      // console.log('creating oauth2-client with default values.');
+      return;
+    }
+    oauth2ClientOptions = value;
+  });
+  const updateOauth2Client = spawn(oryCommand, ['update', 'oauth2-client', oauthClientID, ...oauth2ClientOptions]);
+}
+
 export async function fileType(cmd: string): Promise<string> {
   const formatInput = await vscode.window.showQuickPick(
     [{ label: 'json', picked: true }, { label: 'yaml/yml' }, { label: 'url' }, { label: 'base64' }],
@@ -121,7 +138,9 @@ export async function commandInput(obj: {
   }
 
   if (input === undefined) {
-    throw new Error('Invalid input');
+    // throw new Error('Invalid input');
+    outputChannel.append('Invalid Input');
+    return [];
   }
 
   if (obj.type === 'strings') {

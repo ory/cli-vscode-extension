@@ -274,7 +274,7 @@ export async function runOryCreate() {
       const relationshipConfigFileInput = await vscode.window.showOpenDialog({
         title: 'Ory Create Relationships',
         canSelectMany: false,
-        filters: { "json": ['json']}
+        filters: { json: ['json'] }
       });
 
       if (relationshipConfigFileInput === undefined) {
@@ -282,7 +282,11 @@ export async function runOryCreate() {
         return;
       }
       console.log(relationshipConfigFileInput[0].fsPath);
-      const createRelationships = spawn(oryCommand, ['create', 'relationships', `${relationshipConfigFileInput[0].fsPath}`]);
+      const createRelationships = spawn(oryCommand, [
+        'create',
+        'relationships',
+        `${relationshipConfigFileInput[0].fsPath}`
+      ]);
 
       createRelationships.stdout.on('data', (data) => {
         outputChannel.append('\n' + String(data));
@@ -322,7 +326,7 @@ export async function runOryCreate() {
   }
 }
 
-async function oauth2Client(): Promise<string[]> {
+export async function oauth2Client(): Promise<string[]> {
   const flags = [
     {
       label: 'allowed-cors-origin',
