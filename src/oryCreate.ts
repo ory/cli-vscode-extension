@@ -117,13 +117,20 @@ export async function runOryCreate() {
       console.log(`Got: oauth2-client`);
 
       let oauth2ClientOptions: string[] = [];
-      await oauth2Client().then((value) => {
-        if (value.length === 0) {
-          vscode.window.showInformationMessage('creating oauth2-client with default values.');
-          console.log('creating oauth2-client with default values.');
+      oauth2ClientOptions = await oauth2Client();
+      if (oauth2ClientOptions.length === 0) {
+        const quit = await vscode.window.showInputBox({
+          title: 'Do you want to quit oauth2-client creation?',
+          placeHolder: '[y/n]',
+          ignoreFocusOut: true
+        });
+        if (quit?.toLowerCase() === 'y' || quit === undefined) {
+          return;
         }
-        oauth2ClientOptions = value;
-      });
+        vscode.window.showInformationMessage('creating oauth2-client with default values.');
+        console.log('creating oauth2-client with default values.');
+      }
+
       console.log('This oauth2client: ' + oauth2ClientOptions);
       const createOauth2Client = spawn(oryCommand, ['create', 'oauth2-client', ...oauth2ClientOptions]);
 
@@ -274,7 +281,7 @@ export async function runOryCreate() {
       const relationshipConfigFileInput = await vscode.window.showOpenDialog({
         title: 'Ory Create Relationships',
         canSelectMany: false,
-        filters: { "json": ['json']}
+        filters: { json: ['json'] }
       });
 
       if (relationshipConfigFileInput === undefined) {
@@ -282,7 +289,11 @@ export async function runOryCreate() {
         return;
       }
       console.log(relationshipConfigFileInput[0].fsPath);
-      const createRelationships = spawn(oryCommand, ['create', 'relationships', `${relationshipConfigFileInput[0].fsPath}`]);
+      const createRelationships = spawn(oryCommand, [
+        'create',
+        'relationships',
+        `${relationshipConfigFileInput[0].fsPath}`
+      ]);
 
       createRelationships.stdout.on('data', (data) => {
         outputChannel.append('\n' + String(data));

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { outputChannel, oryCommand } from './extension';
-import { format, spwanCommonErrAndClose, webViewPanel } from './helper';
+import { format, spawnCommonErrAndClose, commandInput } from './helper';
 
 export async function runOryGet() {
   const result = await vscode.window.showQuickPick(
@@ -147,7 +147,7 @@ export function oryGetProject(projectCommandOutput: string[], projectOutputForma
     `${projectOutputFormat}`
   ]);
 
-  spwanCommonErrAndClose(getProject, 'project', projectOutputFormat);
+  spawnCommonErrAndClose(getProject, 'project', projectOutputFormat);
 }
 
 export function oryGetPermissionConfig(permissionConfigCommandOutput: string[], permissionConfigOutputFormat: string) {
@@ -159,7 +159,7 @@ export function oryGetPermissionConfig(permissionConfigCommandOutput: string[], 
     `${permissionConfigOutputFormat}`
   ]);
 
-  spwanCommonErrAndClose(getPermissionConfig, 'permissionConfig', permissionConfigOutputFormat);
+  spawnCommonErrAndClose(getPermissionConfig, 'permissionConfig', permissionConfigOutputFormat);
 }
 
 export function oryGetOauth2Config(oauth2ConfigCommandOutput: string[], oauth2ConfigOutputFormat: string) {
@@ -171,7 +171,7 @@ export function oryGetOauth2Config(oauth2ConfigCommandOutput: string[], oauth2Co
     `${oauth2ConfigOutputFormat}`
   ]);
 
-  spwanCommonErrAndClose(getOauth2Config, 'oauth2Config', oauth2ConfigOutputFormat);
+  spawnCommonErrAndClose(getOauth2Config, 'oauth2Config', oauth2ConfigOutputFormat);
 }
 
 export function oryGetOauth2Client(oauth2ClientCommandOutput: string[], oauth2ClientOutputFormat: string) {
@@ -183,13 +183,13 @@ export function oryGetOauth2Client(oauth2ClientCommandOutput: string[], oauth2Cl
     `${oauth2ClientOutputFormat}`
   ]);
 
-  spwanCommonErrAndClose(getOauth2Client, 'oauth2Client', oauth2ClientOutputFormat);
+  spawnCommonErrAndClose(getOauth2Client, 'oauth2Client', oauth2ClientOutputFormat);
 }
 
 export function oryGetJWK(jwkConfigCommandOutput: string[], jwkConfigOutputFormat: string) {
   const getJWK = spawn(oryCommand, ['get', 'jwk', ...jwkConfigCommandOutput, '--format', `${jwkConfigOutputFormat}`]);
 
-  spwanCommonErrAndClose(getJWK, 'jwk', jwkConfigOutputFormat);
+  spawnCommonErrAndClose(getJWK, 'jwk', jwkConfigOutputFormat);
 }
 
 export function oryGetIdentityConfig(identityConfigCommandOutput: string[], identityConfigOutputFormat: string) {
@@ -201,7 +201,7 @@ export function oryGetIdentityConfig(identityConfigCommandOutput: string[], iden
     `${identityConfigOutputFormat}`
   ]);
 
-  spwanCommonErrAndClose(getIdentityConfig, 'identityConfig', identityConfigOutputFormat);
+  spawnCommonErrAndClose(getIdentityConfig, 'identityConfig', identityConfigOutputFormat);
 }
 
 export function oryGetIdentity(identityCommandOutput: string[], identityOutputFormat: string) {
@@ -213,30 +213,5 @@ export function oryGetIdentity(identityCommandOutput: string[], identityOutputFo
     `${identityOutputFormat}`
   ]);
 
-  spwanCommonErrAndClose(getIdentity, 'identity', identityOutputFormat);
-}
-
-async function commandInput(obj: { label: string; description: string; type: string }): Promise<string[]> {
-  let resultString: string[] = [];
-  let input = await vscode.window.showInputBox({
-    title: obj.label,
-    placeHolder:
-      obj.type === 'string' ? 'Enter project id' : 'Enter multiple inputs "," (comma-separated). ex- id-1, id-2',
-    prompt: obj.description,
-    ignoreFocusOut: true
-  });
-
-  if (input === undefined) {
-    throw new Error('Invalid input');
-  }
-
-  if (obj.type === 'strings') {
-    // (?:,|s)s*
-    input = input.replace(RegExp('(?:,\\s)s*'), ',');
-    resultString = input.split(',');
-  } else {
-    resultString.push(input);
-  }
-
-  return resultString;
+  spawnCommonErrAndClose(getIdentity, 'identity', identityOutputFormat);
 }

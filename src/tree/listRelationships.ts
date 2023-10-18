@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
-import { spwanCommonErrAndClose } from '../helper';
+import { spawnCommonErrAndClose } from '../helper';
 
 interface TreeOutputPermission {
   subject: string;
@@ -94,8 +94,8 @@ export class ListRelationshipsProvider implements vscode.TreeDataProvider<Relati
       if (relationshipsMap.has(subject)) {
         const subjectMap = relationshipsMap.get(subject)!;
         if (subjectMap.has(relation)) {
-          const exisitingObjects = subjectMap.get(relation)!;
-          exisitingObjects.push(object);
+          const existingObjects = subjectMap.get(relation)!;
+          existingObjects.push(object);
         } else {
           subjectMap.set(relation, [object]);
         }
@@ -115,7 +115,7 @@ export class ListRelationshipsProvider implements vscode.TreeDataProvider<Relati
   }
 }
 
-class RelationshipsTreeItem extends vscode.TreeItem {
+export class RelationshipsTreeItem extends vscode.TreeItem {
   public children: RelationshipsTreeItem[];
   constructor(
     public readonly subject: string,
@@ -129,6 +129,7 @@ class RelationshipsTreeItem extends vscode.TreeItem {
     this.tooltip = tooltip ? tooltip : subject;
     this.iconPath = new vscode.ThemeIcon('references', color);
     this.children = [];
+    this.contextValue = 'relationships';
   }
 
   getChildren(): RelationshipsTreeItem[] {
@@ -156,6 +157,13 @@ class RelationshipsTreeItem extends vscode.TreeItem {
     }
     return this.children;
   }
+
+  public get relationshipString(): string {
+    if (this.tooltip !== undefined) {
+      return this.tooltip;
+    }
+    return this.subject;
+  }
 }
 
 export async function runOryListRelationships(): Promise<any> {
@@ -163,7 +171,7 @@ export async function runOryListRelationships(): Promise<any> {
   let json: any;
 
   const listRelationships = spawn(oryCommand, ['list', 'relationships', '--format', `${relationshipOutputFormat}`]);
-  await spwanCommonErrAndClose(listRelationships, 'Relationships').then((value) => {
+  await spawnCommonErrAndClose(listRelationships, 'Relationships').then((value) => {
     json = JSON.parse(value);
   });
   return json;
