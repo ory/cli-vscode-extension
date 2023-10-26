@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { outputChannel, oryCommand } from './extension';
 import { runOryListProjects } from './tree/listProjects';
-import { spwanCommonErrAndClose } from './helper';
+import { spawnCommonErrAndClose } from './helper';
 
 export async function runOryUse() {
   let projectsList: { label: string; description: string }[] = [];
@@ -27,7 +27,7 @@ export async function runOryUse() {
 export async function runOryUseProject(projectId: string, projectName?: string) {
   const useProject = spawn(oryCommand, ['use', 'project', projectId]);
 
-  await spwanCommonErrAndClose(useProject, 'useProject').then((value) => {
+  await spawnCommonErrAndClose(useProject, 'useProject').then((value) => {
     if (value.includes('ID')) {
       vscode.window.showInformationMessage(`Using Project: ${projectName}`);
     }

@@ -87,6 +87,21 @@
           "command": "ory.copy.identityID",
           "when": "view == listIdentities",
           "group": "identities_1_general@2"
+        },
+        {
+          "command": "ory.copy.relationshipString",
+          "when": "view == listRelationships",
+          "group": "relationships_1_general@1"
+        },
+        {
+          "command": "ory.delete.identity",
+          "when": "view == listIdentities && viewItem == identity",
+          "group": "inline"
+        },
+        {
+          "command": "ory.delete.oauth2Client",
+          "when": "view == listOauth2Clients && viewItem == oauth2Clients",
+          "group": "inline"
         }
       ]
     },
@@ -173,6 +188,20 @@
         "title": "Get Identity"
       },
       {
+        "command": "ory.delete",
+        "title": "Ory: Delete"
+      },
+      {
+        "command": "ory.delete.identity",
+        "title": "Delete Identity",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "ory.delete.oauth2Client",
+        "title": "Delete Oauth2-Client",
+        "icon": "$(trash)"
+      },
+      {
         "command": "ory.projects.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
@@ -191,6 +220,10 @@
         "command": "ory.relationships.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "ory.copy.relationshipString",
+        "title": "Copy Relationship String"
       },
       {
         "command": "ory.use",

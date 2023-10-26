@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
-import { spwanCommonErrAndClose } from '../helper';
+import { spawnCommonErrAndClose } from '../helper';
+import { oryDeleteIdentity } from '../oryDelete';
 
 export interface Identity {
   id: string;
@@ -60,6 +61,17 @@ export class ListIdentitiesProvider implements vscode.TreeDataProvider<Identitie
     }
     return [];
   }
+
+  async delete(id: string) {
+    const val = await oryDeleteIdentity([id]);
+    if (val.includes(id)) {
+      const index = this.topLevelItems.findIndex((item) => item.iId === id);
+      if (index !== -1) {
+        this.topLevelItems.splice(index, 1);
+        this._onDidChangeTreeData.fire();
+      }
+    }
+  }
 }
 
 export class IdentitiesTreeItem extends vscode.TreeItem {
@@ -70,6 +82,7 @@ export class IdentitiesTreeItem extends vscode.TreeItem {
     this.tooltip = `ID: ${identity.id}\nState: ${identity.state}\nTraits: ${identity.traits}\nSchema ID: ${identity.schemaId}\nSchema URL: ${identity.schemaUrl}`;
     this.iconPath = this.getIconPath(identity.state);
     this._item = this.identity;
+    this.contextValue = 'identity';
   }
 
   public get iId(): string {
@@ -114,7 +127,7 @@ export async function runOryListIdentities(): Promise<any> {
   let json: any;
 
   const listIdentities = spawn(oryCommand, ['list', 'identities', '--format', `${identitiesOutputFormat}`]);
-  await spwanCommonErrAndClose(listIdentities, 'Identities').then((value) => {
+  await spawnCommonErrAndClose(listIdentities, 'Identities').then((value) => {
     json = JSON.parse(value);
   });
   return json;

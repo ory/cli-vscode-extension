@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { outputChannel, oryCommand } from './extension';
-import { format, spwanCommonErrAndClose } from './helper';
+import { format, spawnCommonErrAndClose } from './helper';
 import { oauth2Client } from './oryCreate';
 
 export async function runOryUpdate() {
@@ -63,7 +63,7 @@ async function oryUpdateIdentityConfig(projectId: string[]) {
       `${fileLocation[0].fsPath}`
     ]);
 
-    spwanCommonErrAndClose(updateIdentityConfig, 'update', '');
+    spawnCommonErrAndClose(updateIdentityConfig, 'update', '');
 
     return;
   }
@@ -80,7 +80,7 @@ async function oryUpdateIdentityConfig(projectId: string[]) {
   }
   const updateIdentityConfig = spawn(oryCommand, ['update', 'identity-config', projectId[0], '--file', configURL]);
 
-  spwanCommonErrAndClose(updateIdentityConfig, 'update', '');
+  spawnCommonErrAndClose(updateIdentityConfig, 'update', '');
 
   return;
 }

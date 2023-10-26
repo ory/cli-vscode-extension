@@ -19,7 +19,8 @@ import * as os from 'os';
 import { runOryUse, runOryUseProject } from './oryUse';
 import { IdentitiesTreeItem, ListIdentitiesProvider } from './tree/listIdentities';
 import { ListOauth2ClientsProvider, Oauth2ClientsTreeItem } from './tree/listOauth2Clients';
-import { ListRelationshipsProvider } from './tree/listRelationships';
+import { ListRelationshipsProvider, RelationshipsTreeItem } from './tree/listRelationships';
+import { runOryDelete } from './oryDelete';
 import { runOryCreate } from './oryCreate';
 import { runOryUpdate } from './oryUpdate';
 
@@ -196,6 +197,39 @@ export async function activate(context: vscode.ExtensionContext) {
     context
   );
   registerCommand('ory.update', () => runOryUpdate(), context);
+  registerCommand(
+    'ory.copy.relationshipString',
+    async (node?: RelationshipsTreeItem) => {
+      console.log(node?.relationshipString);
+      if (node !== undefined) {
+        vscode.env.clipboard
+          .writeText(node.relationshipString)
+          .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
+      }
+    },
+    context
+  );
+  registerCommand('ory.delete', () => runOryDelete(), context);
+  registerCommand(
+    'ory.delete.identity',
+    async (node?: IdentitiesTreeItem) => {
+      console.log(node?.iId);
+      if (node !== undefined) {
+        listIdentitiesProvider.delete(node.iId);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.delete.oauth2Client',
+    async (node?: Oauth2ClientsTreeItem) => {
+      console.log(node?.clientID);
+      if (node !== undefined) {
+        listOauth2ClientsProvider.delete(node.clientID);
+      }
+    },
+    context
+  );
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
 }
 

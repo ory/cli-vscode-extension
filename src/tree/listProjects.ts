@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
-import { spwanCommonErrAndClose } from '../helper';
+import { spawnCommonErrAndClose } from '../helper';
 
 export interface Project {
   id: string;
@@ -66,6 +66,7 @@ export class ProjectsTreeItem extends vscode.TreeItem {
     this.tooltip = `ID: ${project.id}\nSlug: ${project.slug}\nState: ${project.state}`;
     this.iconPath = this.getIconPath(project.state);
     this._item = this.project;
+    this.contextValue = 'project';
   }
 
   public get pId(): string {
@@ -109,7 +110,7 @@ export async function runOryListProjects(): Promise<any> {
   let json: any;
 
   const listProject = spawn(oryCommand, ['list', 'projects', '--format', `${projectOutputFormat}`]);
-  await spwanCommonErrAndClose(listProject, 'Projects').then((value) => {
+  await spawnCommonErrAndClose(listProject, 'Projects').then((value) => {
     json = JSON.parse(value);
   });
   return json;
