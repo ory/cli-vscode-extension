@@ -38,8 +38,10 @@ export async function spawnCommonErrAndClose(
       }
       if (data.includes('Error: no project was specified')) {
         vscode.window.showErrorMessage('No project id was specified');
+      } else if (data.includes('Warning')) {
+        vscode.window.showWarningMessage('Warnings were found. Please check in Output → Ory');
       } else {
-        vscode.window.showErrorMessage('Oops 🫢 something went wrong! Please check in Output -> Ory');
+        vscode.window.showErrorMessage('Oops 🫢 something went wrong! Please check in Output → Ory');
       }
     });
 
@@ -79,7 +81,12 @@ export function webViewPanel(viewType: string, title: string, showOptions: vscod
   panel.webview.html = htmlContent;
 }
 
-export async function commandInput(obj: { label: string; description: string; type: string; useLabelPlaceHolder?: boolean; }): Promise<string[]> {
+export async function commandInput(obj: {
+  label: string;
+  description: string;
+  type: string;
+  useLabelPlaceHolder?: boolean;
+}): Promise<string[]> {
   let resultString: string[] = [];
   let input: string | undefined;
   if (obj.type === 'empty') {

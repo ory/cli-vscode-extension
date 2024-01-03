@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { outputChannel, oryCommand } from './extension';
-import { format, spawnCommonErrAndClose } from './helper';
+import { spawnCommonErrAndClose } from './helper';
 import { oauth2Client } from './oryCreate';
 
 export async function runOryUpdate() {
@@ -12,7 +12,7 @@ export async function runOryUpdate() {
         description: 'Update the Ory Identities configuration of the specified Ory Network project.',
         type: 'string'
       },
-      { label: 'oauth2-client', description: 'Update an OAuth 2.0 Client.', type: 'string' },
+      { label: 'oauth2-client', description: 'Update an OAuth 2.0 Client.', type: 'string', useLabelPlaceHolder: true },
       {
         label: 'oauth2-config',
         description: 'Update the Ory OAuth2 & OpenID Connect configuration of the specified Ory Network project.',
@@ -31,57 +31,54 @@ export async function runOryUpdate() {
 
   switch (result?.label) {
     case 'identity-config':
+      const identityProjectId = await commandInput(result);
+      if (identityProjectId.length === 0) {
+        return;
+      }
+      await oryUpdateIdentityConfig(identityProjectId);
+      break;
+    case 'oauth2-client':
+      const oauth2ClientId = await commandInput(result);
+      if (oauth2ClientId.length === 0) {
+        return;
+      }
+      await updateOAuth2Client(oauth2ClientId[0]);
+      break;
+    case 'oauth2-config':
+      const oauth2ConfigPID = await commandInput(result);
+      if (oauth2ConfigPID.length === 0) {
+        return;
+      }
+      await updateOAuth2Config(oauth2ConfigPID);
+      break;
+    case 'permission-config':
+      const permissionConfigPID = await commandInput(result);
+      if (permissionConfigPID.length === 0) {
+        return;
+      }
+      await updatePermissionConfig(permissionConfigPID);
+      break;
+    case 'opl':
+      const oplPID = await commandInput(result);
+      if (oplPID.length === 0) {
+        return;
+      }
+      await updateOPL(oplPID);
+      break;
+    case 'project':
       const projectId = await commandInput(result);
       if (projectId.length === 0) {
         return;
       }
-      await oryUpdateIdentityConfig(projectId);
+      await updateProjectConfig(projectId);
       break;
   }
+  return;
 }
 
 // TODO: need to fix error message after updating config.
 async function oryUpdateIdentityConfig(projectId: string[]) {
-  // select file type json, yml, url or base64://json
-  const fileTypeInput = await fileType('Identity Config');
-  if (fileTypeInput === 'yaml/yml' || fileTypeInput === 'json') {
-    const fileLocation = await vscode.window.showOpenDialog({
-      title: 'Ory Update Identity Config',
-      canSelectMany: false,
-      filters: { yaml: ['yaml', 'yml'], json: ['json'] }
-    });
-
-    if (fileLocation === undefined) {
-      return;
-    }
-
-    const updateIdentityConfig = spawn(oryCommand, [
-      'update',
-      'identity-config',
-      projectId[0],
-      '--file',
-      `${fileLocation[0].fsPath}`
-    ]);
-
-    spawnCommonErrAndClose(updateIdentityConfig, 'update', '');
-
-    return;
-  }
-  // take input for base64 and url
-  const base64OrURLPrefix = fileTypeInput === 'url' ? 'https://example.org/config.yaml' : 'base64://<json>';
-  const configURL = await vscode.window.showInputBox({
-    title: 'Ory Update Identity Config',
-    placeHolder: `Enter ${base64OrURLPrefix}`,
-    ignoreFocusOut: true
-  });
-
-  if (configURL === undefined) {
-    return;
-  }
-  const updateIdentityConfig = spawn(oryCommand, ['update', 'identity-config', projectId[0], '--file', configURL]);
-
-  spawnCommonErrAndClose(updateIdentityConfig, 'update', '');
-
+  await configUpdater('Identity', 'identity-config', projectId);
   return;
 }
 
@@ -89,13 +86,159 @@ async function updateOAuth2Client(oauthClientID: string) {
   let oauth2ClientOptions: string[] = [];
   await oauth2Client().then((value) => {
     if (value.length === 0) {
-      // vscode.window.showInformationMessage('creating oauth2-client with default values.');
-      // console.log('creating oauth2-client with default values.');
       return;
     }
     oauth2ClientOptions = value;
   });
   const updateOauth2Client = spawn(oryCommand, ['update', 'oauth2-client', oauthClientID, ...oauth2ClientOptions]);
+
+  var successUpdateOrNot = await spawnCommonErrAndClose(updateOauth2Client, '', '');
+  console.log('success: ' + successUpdateOrNot);
+  return;
+}
+
+async function updateOAuth2Config(projectId: string[]) {
+  await configUpdater('OAuth2', `oauth2-config`, projectId);
+  return;
+}
+
+async function updatePermissionConfig(projectId: string[]) {
+  await configUpdater('Permission', `oauth2-config`, projectId);
+  return;
+}
+
+async function updateOPL(projectID: string[]) {
+  const formatInput = await vscode.window.showQuickPick([{ label: 'url' }, { label: 'file' }], {
+    title: `update opl format`,
+    placeHolder: 'Set the output format',
+    ignoreFocusOut: true
+  });
+
+  if (formatInput?.label === 'file') {
+    const fileLocation = await openFileSelection(`Ory Update OLP Config`, {
+      typescript: ['ts']
+    });
+
+    if (fileLocation === undefined) {
+      return;
+    }
+    console.log(projectID);
+    const updateOPLConfig = spawn(oryCommand, [
+      'update',
+      'opl',
+      '--project',
+      projectID[0],
+      '--file',
+      `${fileLocation[0].fsPath}`
+    ]);
+
+    await spawnCommonErrAndClose(updateOPLConfig, 'update opl', '');
+
+    return;
+  }
+
+  const configURL = await getInputBox(`Ory Update OPL Config`, `Enter https://example.org/config.ts`);
+
+  if (configURL === undefined) {
+    return;
+  }
+  const updateConfig = spawn(oryCommand, ['update', 'opl', '--project', projectID[0], '--file', configURL]);
+
+  await spawnCommonErrAndClose(updateConfig, 'update opl', '');
+
+  return;
+}
+
+async function updateProjectConfig(projectId: string[]) {
+  const yNInput = await vscode.window.showQuickPick([{ label: 'yes' }, { label: 'no' }], {
+    title: `Do you want to update project name?`,
+    placeHolder: '[yes/no]',
+    ignoreFocusOut: true
+  });
+
+  if (yNInput === undefined) {
+    return;
+  }
+
+  let nameFlag: string[] = [];
+
+  switch (yNInput.label.toLowerCase()) {
+    case 'yes':
+      const name = await vscode.window.showInputBox({
+        title: 'update name',
+        placeHolder: 'name'
+      });
+      nameFlag.push('--name');
+      nameFlag.push(`"${name}"`);
+      break;
+    default:
+      break;
+  }
+  await configUpdater('Project', 'project', projectId, nameFlag);
+  return;
+}
+
+async function configUpdater(name: string, subCmdName: string, projectId: string[], optFlags?: string[]) {
+  if (optFlags === undefined) {
+    optFlags = [];
+  }
+  // select file type json, yml, url or base64://json
+  const fileTypeInput = await fileType(`${name} Config`);
+  if (fileTypeInput === 'yaml/yml' || fileTypeInput === 'json') {
+    const fileLocation = await openFileSelection(`Ory Update ${name} Config`, {
+      yaml: ['yaml', 'yml'],
+      json: ['json']
+    });
+
+    if (fileLocation === undefined) {
+      return;
+    }
+
+    const updateConfig = spawn(oryCommand, [
+      'update',
+      `${subCmdName}`,
+      projectId[0],
+      '--file',
+      `${fileLocation[0].fsPath}`,
+      ...optFlags
+    ]);
+
+    await spawnCommonErrAndClose(updateConfig, 'update', '');
+
+    return;
+  }
+  // take input for base64 and url
+  const base64OrURLPrefix = fileTypeInput === 'url' ? 'https://example.org/config.yaml' : 'base64://<json>';
+  const configURL = await getInputBox(`Ory Update ${name} Config`, `Enter ${base64OrURLPrefix}`);
+
+  if (configURL === undefined) {
+    return;
+  }
+  const updateConfig = spawn(oryCommand, ['update', `${subCmdName}`, projectId[0], '--file', configURL, ...optFlags]);
+
+  await spawnCommonErrAndClose(updateConfig, '', '');
+
+  return;
+}
+
+async function openFileSelection(title: string, filters: any) {
+  const fileLocation = await vscode.window.showOpenDialog({
+    title: title,
+    canSelectMany: false,
+    filters: filters
+  });
+
+  return fileLocation;
+}
+
+async function getInputBox(title: string, placeHolder: string) {
+  const userInput = await vscode.window.showInputBox({
+    title: title,
+    placeHolder: placeHolder,
+    ignoreFocusOut: true
+  });
+
+  return userInput;
 }
 
 export async function fileType(cmd: string): Promise<string> {
@@ -127,7 +270,7 @@ export async function commandInput(obj: {
   if (obj.type === 'empty') {
     input = '';
   } else {
-    let placeHolder = obj.useLabelPlaceHolder ? obj.label : 'Project ID';
+    let placeHolder = obj.useLabelPlaceHolder ? obj.label + ' ID' : 'Project ID';
     input = await vscode.window.showInputBox({
       title: obj.label,
       placeHolder:
