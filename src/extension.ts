@@ -22,7 +22,15 @@ import { ListOauth2ClientsProvider, Oauth2ClientsTreeItem } from './tree/listOau
 import { ListRelationshipsProvider, RelationshipsTreeItem } from './tree/listRelationships';
 import { runOryDelete } from './oryDelete';
 import { runOryCreate } from './oryCreate';
-import { runOryUpdate } from './oryUpdate';
+import {
+  oryUpdateIdentityConfig,
+  oryUpdateOAuth2Client,
+  oryUpdateOAuth2Config,
+  oryUpdateOPL,
+  oryUpdatePermissionConfig,
+  oryUpdateProjectConfig,
+  runOryUpdate
+} from './oryUpdate';
 
 export const outputChannel = vscode.window.createOutputChannel('Ory');
 
@@ -205,6 +213,66 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.env.clipboard
           .writeText(node.relationshipString)
           .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.identityConfig',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateIdentityConfig([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.oauth2Client',
+    async (node?: Oauth2ClientsTreeItem) => {
+      console.log(node?.clientID);
+      if (node !== undefined) {
+        await oryUpdateOAuth2Client(node.clientID);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.oauth2Config',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateOAuth2Config([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.OPL',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateOPL([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.permissionConfig',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdatePermissionConfig([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.projectConfig',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateProjectConfig([node.pId]);
       }
     },
     context

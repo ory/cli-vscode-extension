@@ -42,47 +42,47 @@ export async function runOryUpdate() {
       if (oauth2ClientId.length === 0) {
         return;
       }
-      await updateOAuth2Client(oauth2ClientId[0]);
+      await oryUpdateOAuth2Client(oauth2ClientId[0]);
       break;
     case 'oauth2-config':
       const oauth2ConfigPID = await commandInput(result);
       if (oauth2ConfigPID.length === 0) {
         return;
       }
-      await updateOAuth2Config(oauth2ConfigPID);
+      await oryUpdateOAuth2Config(oauth2ConfigPID);
       break;
     case 'permission-config':
       const permissionConfigPID = await commandInput(result);
       if (permissionConfigPID.length === 0) {
         return;
       }
-      await updatePermissionConfig(permissionConfigPID);
+      await oryUpdatePermissionConfig(permissionConfigPID);
       break;
     case 'opl':
       const oplPID = await commandInput(result);
       if (oplPID.length === 0) {
         return;
       }
-      await updateOPL(oplPID);
+      await oryUpdateOPL(oplPID);
       break;
     case 'project':
       const projectId = await commandInput(result);
       if (projectId.length === 0) {
         return;
       }
-      await updateProjectConfig(projectId);
+      await oryUpdateProjectConfig(projectId);
       break;
   }
   return;
 }
 
 // TODO: need to fix error message after updating config.
-async function oryUpdateIdentityConfig(projectId: string[]) {
+export async function oryUpdateIdentityConfig(projectId: string[]) {
   await configUpdater('Identity', 'identity-config', projectId);
   return;
 }
 
-async function updateOAuth2Client(oauthClientID: string) {
+export async function oryUpdateOAuth2Client(oauthClientID: string) {
   let oauth2ClientOptions: string[] = [];
   await oauth2Client().then((value) => {
     if (value.length === 0) {
@@ -97,22 +97,26 @@ async function updateOAuth2Client(oauthClientID: string) {
   return;
 }
 
-async function updateOAuth2Config(projectId: string[]) {
+export async function oryUpdateOAuth2Config(projectId: string[]) {
   await configUpdater('OAuth2', `oauth2-config`, projectId);
   return;
 }
 
-async function updatePermissionConfig(projectId: string[]) {
-  await configUpdater('Permission', `oauth2-config`, projectId);
+export async function oryUpdatePermissionConfig(projectId: string[]) {
+  await configUpdater('Permission', `permission-config`, projectId);
   return;
 }
 
-async function updateOPL(projectID: string[]) {
+export async function oryUpdateOPL(projectID: string[]) {
   const formatInput = await vscode.window.showQuickPick([{ label: 'url' }, { label: 'file' }], {
     title: `update opl format`,
     placeHolder: 'Set the output format',
     ignoreFocusOut: true
   });
+
+  if (formatInput === undefined) {
+    return;
+  }
 
   if (formatInput?.label === 'file') {
     const fileLocation = await openFileSelection(`Ory Update OLP Config`, {
@@ -149,7 +153,7 @@ async function updateOPL(projectID: string[]) {
   return;
 }
 
-async function updateProjectConfig(projectId: string[]) {
+export async function oryUpdateProjectConfig(projectId: string[]) {
   const yNInput = await vscode.window.showQuickPick([{ label: 'yes' }, { label: 'no' }], {
     title: `Do you want to update project name?`,
     placeHolder: '[yes/no]',
@@ -184,6 +188,10 @@ async function configUpdater(name: string, subCmdName: string, projectId: string
   }
   // select file type json, yml, url or base64://json
   const fileTypeInput = await fileType(`${name} Config`);
+  if (fileTypeInput === 'noUploadTypeSelected') {
+    return;
+  }
+
   if (fileTypeInput === 'yaml/yml' || fileTypeInput === 'json') {
     const fileLocation = await openFileSelection(`Ory Update ${name} Config`, {
       yaml: ['yaml', 'yml'],
@@ -246,7 +254,9 @@ export async function fileType(cmd: string): Promise<string> {
     [{ label: 'json', picked: true }, { label: 'yaml/yml' }, { label: 'url' }, { label: 'base64' }],
     { title: `${cmd} format`, placeHolder: 'Set the output format', ignoreFocusOut: true }
   );
-
+  if (formatInput === undefined) {
+    return 'noUploadTypeSelected';
+  }
   switch (formatInput?.label) {
     case 'yaml/yml':
       return 'yaml';
