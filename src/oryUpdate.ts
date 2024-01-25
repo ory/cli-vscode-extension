@@ -26,7 +26,7 @@ export async function runOryUpdate() {
       },
       { label: 'project', description: 'Update Ory Network project service configuration.', type: 'string' }
     ],
-    { placeHolder: 'Pick to update resource...', title: 'Ory Get', ignoreFocusOut: true }
+    { placeHolder: 'Pick to update resource...', title: 'Ory Update', ignoreFocusOut: true }
   );
 
   switch (result?.label) {
