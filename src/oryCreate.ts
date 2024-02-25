@@ -333,7 +333,7 @@ export async function runOryCreate() {
   }
 }
 
-async function oauth2Client(): Promise<string[]> {
+export async function oauth2Client(): Promise<string[]> {
   const flags = [
     {
       label: 'allowed-cors-origin',
