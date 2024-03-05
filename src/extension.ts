@@ -22,6 +22,7 @@ import { ListOauth2ClientsProvider, Oauth2ClientsTreeItem } from './tree/listOau
 import { ListRelationshipsProvider, RelationshipsTreeItem } from './tree/listRelationships';
 import { runOryDelete } from './oryDelete';
 import { runOryCreate } from './oryCreate';
+import { runOryIntrospect } from './introspect';
 
 export const outputChannel = vscode.window.createOutputChannel('Ory');
 
@@ -228,6 +229,8 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+
+  registerCommand('ory.introspect.token', () => runOryIntrospect(), context);
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
 }
 

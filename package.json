@@ -32,6 +32,10 @@
           "group": "navigation@1"
         },
         {
+          "command": "ory.introspect.token",
+          "when": "view == listOauth2Clients"
+        },
+        {
           "command": "ory.relationships.refresh",
           "when": "view == listRelationships",
           "group": "navigation@1"
@@ -248,6 +252,10 @@
       {
         "command": "ory.create",
         "title": "Ory: Create"
+      },
+      {
+        "command": "ory.introspect.token",
+        "title": "Ory: Introspect Token"
       }
     ]
   },
