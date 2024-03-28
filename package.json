@@ -35,6 +35,11 @@
           "command": "ory.relationships.refresh",
           "when": "view == listRelationships",
           "group": "navigation@1"
+        },
+        {
+          "command": "ory.tunnel.refresh",
+          "when": "view == listRunningProcesses",
+          "group": "navigation@1"
         }
       ],
       "view/item/context": [
@@ -102,6 +107,11 @@
           "command": "ory.delete.oauth2Client",
           "when": "view == listOauth2Clients && viewItem == oauth2Clients",
           "group": "inline"
+        },
+        {
+          "command": "ory.tunnel.stopProcess",
+          "when": "view == listRunningProcesses && viewItem == runningProcess",
+          "group": "inline"
         }
       ]
     },
@@ -131,6 +141,10 @@
         {
           "id": "listRelationships",
           "name": "Relationships"
+        },
+        {
+          "id": "listRunningProcesses",
+          "name": "Tunnel Running Processes"
         }
       ]
     },
@@ -222,6 +236,16 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "ory.tunnel.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "ory.tunnel.stopProcess",
+        "title": "Stop Process",
+        "icon": "$(debug-stop)"
+      },
+      {
         "command": "ory.copy.relationshipString",
         "title": "Copy Relationship String"
       },
@@ -248,6 +272,10 @@
       {
         "command": "ory.create",
         "title": "Ory: Create"
+      },
+      {
+        "command": "ory.tunnel",
+        "title": "Ory: Tunnel"
       }
     ]
   },

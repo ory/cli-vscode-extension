@@ -20,8 +20,10 @@ import { runOryUse, runOryUseProject } from './oryUse';
 import { IdentitiesTreeItem, ListIdentitiesProvider } from './tree/listIdentities';
 import { ListOauth2ClientsProvider, Oauth2ClientsTreeItem } from './tree/listOauth2Clients';
 import { ListRelationshipsProvider, RelationshipsTreeItem } from './tree/listRelationships';
+import { ListRunningProcessProvider, RunningProcessTreeItem } from './tree/listTunnelProcess';
 import { runOryDelete } from './oryDelete';
 import { runOryCreate } from './oryCreate';
+import { runOryTunnel } from './oryTunnel';
 
 export const outputChannel = vscode.window.createOutputChannel('Ory');
 
@@ -69,6 +71,14 @@ export async function activate(context: vscode.ExtensionContext) {
   const relationshipsView = vscode.window.createTreeView('listRelationships', {
     treeDataProvider: listRelationshipsProvider,
     showCollapseAll: true
+  });
+
+  // Tunnel list
+  const listRunningProcessProvider = new ListRunningProcessProvider();
+  vscode.window.registerTreeDataProvider('listRunningProcesses', listRunningProcessProvider);
+  registerCommand('ory.tunnel.refresh', () => listRunningProcessProvider.refresh(), context);
+  const tunnelView = vscode.window.createTreeView('listRunningProcesses', {
+    treeDataProvider: listRunningProcessProvider
   });
 
   registerCommand('ory.helloWorld', () => vscode.window.showInformationMessage('Hello World from ory!'), context);
@@ -224,6 +234,18 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log(node?.clientID);
       if (node !== undefined) {
         listOauth2ClientsProvider.delete(node.clientID);
+      }
+    },
+    context
+  );
+
+  registerCommand('ory.tunnel', () => runOryTunnel(listRunningProcessProvider), context);
+  registerCommand(
+    'ory.tunnel.stopProcess',
+    async (node?: RunningProcessTreeItem) => {
+      console.log(node?.runningPS.processName);
+      if (node !== undefined) {
+        listRunningProcessProvider.remove(node.runningPS.id);
       }
     },
     context
