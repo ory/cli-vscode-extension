@@ -56,7 +56,7 @@ export class RunningProcessTreeItem extends vscode.TreeItem {
   constructor(public readonly runningPS: RunningProcess) {
     super(runningPS.processName, vscode.TreeItemCollapsibleState.None);
 
-    this.tooltip = `Process: ${runningPS.id}`;
+    this.tooltip = `Process: ${runningPS.id}\nApplication: ${runningPS.processName}`;
     this.iconPath = this.getIconPath(runningPS.status);
     this._item = runningPS;
     this.contextValue = 'runningProcess';
