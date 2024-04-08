@@ -22,9 +22,17 @@
           "group": "navigation@1"
         },
         {
+          "command": "ory.projects.patchConfig",
+          "when": "view == listProjects"
+        },
+        {
           "command": "ory.identities.refresh",
           "when": "view == listIdentities",
           "group": "navigation@1"
+        },
+        {
+          "command": "ory.identities.patchConfig",
+          "when": "view == listIdentities"
         },
         {
           "command": "ory.oauth2clients.refresh",
@@ -32,9 +40,21 @@
           "group": "navigation@1"
         },
         {
+          "command": "ory.oauth2clients.patchConfig",
+          "when": "view == listOauth2Clients"
+        },
+        {
           "command": "ory.relationships.refresh",
           "when": "view == listRelationships",
           "group": "navigation@1"
+        },
+        {
+          "command": "ory.relationships.patchConfig",
+          "when": "view == listRelationships"
+        },
+        {
+          "command": "ory.relationships.patchOPL",
+          "when": "view == listRelationships"
         }
       ],
       "view/item/context": [
@@ -278,6 +298,30 @@
       {
         "command": "ory.create",
         "title": "Ory: Create"
+      },
+      {
+        "command": "ory.patch",
+        "title": "Ory: Patch"
+      },
+      {
+        "command": "ory.identities.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.oauth2clients.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.projects.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.relationships.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.relationships.patchOPL",
+        "title": "Patch OPL"
       },
       {
         "command": "ory.update",

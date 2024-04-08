@@ -23,6 +23,14 @@ import { ListRelationshipsProvider, RelationshipsTreeItem } from './tree/listRel
 import { runOryDelete } from './oryDelete';
 import { runOryCreate } from './oryCreate';
 import {
+  oryPatchIdentityConfig,
+  oryPatchOAuth2Config,
+  oryPatchOPL,
+  oryPatchPermissionConfig,
+  oryPatchProject,
+  runOryPatch
+} from './oryPatch';
+import {
   oryUpdateIdentityConfig,
   oryUpdateOAuth2Client,
   oryUpdateOAuth2Config,
@@ -84,9 +92,15 @@ export async function activate(context: vscode.ExtensionContext) {
   registerCommand('ory.version', () => runOryVersion(), context);
   registerCommand('ory.activate', () => vscode.window.showInformationMessage('Ory is activated'), context);
   registerCommand('ory.promptforinstall', () => offerToInstallOry(), context);
+
+  // Auth Command
   registerCommand('ory.auth', () => runOryAuth(), context);
   registerCommand('ory.auth.logout', () => runOryAuthLogout(), context);
+
+  // Create Command
   registerCommand('ory.create', () => runOryCreate(), context);
+
+  // Use Command
   registerCommand('ory.use', () => runOryUse(), context);
   registerCommand(
     'ory.use.project',
@@ -97,6 +111,8 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+
+  // Copy Command
   registerCommand(
     'ory.copy.projectId',
     (node?: ProjectsTreeItem) => {
@@ -108,6 +124,32 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+  registerCommand(
+    'ory.copy.identityID',
+    async (node?: IdentitiesTreeItem) => {
+      console.log(node?.iId);
+      if (node !== undefined) {
+        vscode.env.clipboard
+          .writeText(node.iId)
+          .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.copy.relationshipString',
+    async (node?: RelationshipsTreeItem) => {
+      console.log(node?.relationshipString);
+      if (node !== undefined) {
+        vscode.env.clipboard
+          .writeText(node.relationshipString)
+          .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
+      }
+    },
+    context
+  );
+
+  // Get Command
   registerCommand('ory.get', () => runOryGet(), context);
   registerCommand(
     'ory.get.projectConfig',
@@ -192,6 +234,7 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+
   registerCommand(
     'ory.copy.identityID',
     async (node?: IdentitiesTreeItem) => {
@@ -296,6 +339,51 @@ export async function activate(context: vscode.ExtensionContext) {
         listOauth2ClientsProvider.delete(node.clientID);
       }
     },
+    context
+  );
+
+  // Patch Command
+  registerCommand('ory.patch', () => runOryPatch(), context);
+  registerCommand(
+    'ory.identities.patchConfig',
+    () =>
+      oryPatchIdentityConfig({
+        label: 'identity-config',
+        description: 'Patch the Ory Identities configuration of the defined Ory Network project.'
+      }),
+    context
+  );
+  registerCommand(
+    'ory.oauth2clients.patchConfig',
+    () => {
+      oryPatchOAuth2Config({
+        label: 'oauth2-config',
+        description: 'Patch the Ory OAuth2 & OpenID Connect configuration of the specified Ory Network project.'
+      });
+    },
+    context
+  );
+  registerCommand(
+    'ory.relationships.patchConfig',
+    () =>
+      oryPatchPermissionConfig({
+        label: 'permission-config',
+        description: 'Patch the Ory Permissions configuration of the specified Ory Network project.'
+      }),
+    context
+  );
+  registerCommand(
+    'ory.projects.patchConfig',
+    () =>
+      oryPatchProject({
+        label: 'project',
+        description: 'Patch the Ory Network project configuration.'
+      }),
+    context
+  );
+  registerCommand(
+    'ory.relationships.patchOPL',
+    () => oryPatchOPL({ label: 'opl', description: 'Update the Ory Permission Language file in Ory Network.' }),
     context
   );
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
