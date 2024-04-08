@@ -23,6 +23,23 @@ import { ListRelationshipsProvider, RelationshipsTreeItem } from './tree/listRel
 import { runOryDelete } from './oryDelete';
 import { runOryCreate } from './oryCreate';
 import { runOryIntrospect } from './introspect';
+import {
+  oryPatchIdentityConfig,
+  oryPatchOAuth2Config,
+  oryPatchOPL,
+  oryPatchPermissionConfig,
+  oryPatchProject,
+  runOryPatch
+} from './oryPatch';
+import {
+  oryUpdateIdentityConfig,
+  oryUpdateOAuth2Client,
+  oryUpdateOAuth2Config,
+  oryUpdateOPL,
+  oryUpdatePermissionConfig,
+  oryUpdateProjectConfig,
+  runOryUpdate
+} from './oryUpdate';
 
 export const outputChannel = vscode.window.createOutputChannel('Ory');
 
@@ -76,9 +93,15 @@ export async function activate(context: vscode.ExtensionContext) {
   registerCommand('ory.version', () => runOryVersion(), context);
   registerCommand('ory.activate', () => vscode.window.showInformationMessage('Ory is activated'), context);
   registerCommand('ory.promptforinstall', () => offerToInstallOry(), context);
+
+  // Auth Command
   registerCommand('ory.auth', () => runOryAuth(), context);
   registerCommand('ory.auth.logout', () => runOryAuthLogout(), context);
+
+  // Create Command
   registerCommand('ory.create', () => runOryCreate(), context);
+
+  // Use Command
   registerCommand('ory.use', () => runOryUse(), context);
   registerCommand(
     'ory.use.project',
@@ -89,6 +112,8 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+
+  // Copy Command
   registerCommand(
     'ory.copy.projectId',
     (node?: ProjectsTreeItem) => {
@@ -100,6 +125,32 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+  registerCommand(
+    'ory.copy.identityID',
+    async (node?: IdentitiesTreeItem) => {
+      console.log(node?.iId);
+      if (node !== undefined) {
+        vscode.env.clipboard
+          .writeText(node.iId)
+          .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.copy.relationshipString',
+    async (node?: RelationshipsTreeItem) => {
+      console.log(node?.relationshipString);
+      if (node !== undefined) {
+        vscode.env.clipboard
+          .writeText(node.relationshipString)
+          .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
+      }
+    },
+    context
+  );
+
+  // Get Command
   registerCommand('ory.get', () => runOryGet(), context);
   registerCommand(
     'ory.get.projectConfig',
@@ -184,6 +235,7 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+
   registerCommand(
     'ory.copy.identityID',
     async (node?: IdentitiesTreeItem) => {
@@ -196,6 +248,7 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     context
   );
+  registerCommand('ory.update', () => runOryUpdate(), context);
   registerCommand(
     'ory.copy.relationshipString',
     async (node?: RelationshipsTreeItem) => {
@@ -204,6 +257,66 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.env.clipboard
           .writeText(node.relationshipString)
           .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.identityConfig',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateIdentityConfig([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.oauth2Client',
+    async (node?: Oauth2ClientsTreeItem) => {
+      console.log(node?.clientID);
+      if (node !== undefined) {
+        await oryUpdateOAuth2Client(node.clientID);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.oauth2Config',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateOAuth2Config([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.OPL',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateOPL([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.permissionConfig',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdatePermissionConfig([node.pId]);
+      }
+    },
+    context
+  );
+  registerCommand(
+    'ory.update.projectConfig',
+    async (node?: ProjectsTreeItem) => {
+      console.log(node?.pId);
+      if (node !== undefined) {
+        await oryUpdateProjectConfig([node.pId]);
       }
     },
     context
@@ -231,6 +344,52 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   registerCommand('ory.introspect.token', () => runOryIntrospect(), context);
+  
+  // Patch Command
+  registerCommand('ory.patch', () => runOryPatch(), context);
+  registerCommand(
+    'ory.identities.patchConfig',
+    () =>
+      oryPatchIdentityConfig({
+        label: 'identity-config',
+        description: 'Patch the Ory Identities configuration of the defined Ory Network project.'
+      }),
+    context
+  );
+  registerCommand(
+    'ory.oauth2clients.patchConfig',
+    () => {
+      oryPatchOAuth2Config({
+        label: 'oauth2-config',
+        description: 'Patch the Ory OAuth2 & OpenID Connect configuration of the specified Ory Network project.'
+      });
+    },
+    context
+  );
+  registerCommand(
+    'ory.relationships.patchConfig',
+    () =>
+      oryPatchPermissionConfig({
+        label: 'permission-config',
+        description: 'Patch the Ory Permissions configuration of the specified Ory Network project.'
+      }),
+    context
+  );
+  registerCommand(
+    'ory.projects.patchConfig',
+    () =>
+      oryPatchProject({
+        label: 'project',
+        description: 'Patch the Ory Network project configuration.'
+      }),
+    context
+  );
+  registerCommand(
+    'ory.relationships.patchOPL',
+    () => oryPatchOPL({ label: 'opl', description: 'Update the Ory Permission Language file in Ory Network.' }),
+    context
+  );
+
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
 }
 
