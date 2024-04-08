@@ -38,8 +38,13 @@ export async function spawnCommonErrAndClose(
       }
       if (data.includes('Error: no project was specified')) {
         vscode.window.showErrorMessage('No project id was specified');
+      } else if (data.includes('Warning')) {
+        vscode.window.showWarningMessage('Warnings were found. Please check in Output → Ory');
+        if (data.includes('Project updated successfully!')) {
+          vscode.window.showInformationMessage('Project updated successfully!');
+        }
       } else {
-        vscode.window.showErrorMessage('Oops 🫢 something went wrong! Please check in Output -> Ory');
+        vscode.window.showErrorMessage('Oops 🫢 something went wrong! Please check in Output → Ory');
       }
     });
 
