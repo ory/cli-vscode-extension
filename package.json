@@ -40,6 +40,10 @@
           "group": "navigation@1"
         },
         {
+          "command": "ory.introspect.token",
+          "when": "view == listOauth2Clients"
+        },
+        {
           "command": "ory.oauth2clients.patchConfig",
           "when": "view == listOauth2Clients"
         },
@@ -298,6 +302,10 @@
       {
         "command": "ory.create",
         "title": "Ory: Create"
+      },
+      {
+        "command": "ory.introspect.token",
+        "title": "Ory: Introspect Token"
       },
       {
         "command": "ory.patch",

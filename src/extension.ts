@@ -22,6 +22,7 @@ import { ListOauth2ClientsProvider, Oauth2ClientsTreeItem } from './tree/listOau
 import { ListRelationshipsProvider, RelationshipsTreeItem } from './tree/listRelationships';
 import { runOryDelete } from './oryDelete';
 import { runOryCreate } from './oryCreate';
+import { runOryIntrospect } from './introspect';
 import {
   oryPatchIdentityConfig,
   oryPatchOAuth2Config,
@@ -342,6 +343,8 @@ export async function activate(context: vscode.ExtensionContext) {
     context
   );
 
+  registerCommand('ory.introspect.token', () => runOryIntrospect(), context);
+  
   // Patch Command
   registerCommand('ory.patch', () => runOryPatch(), context);
   registerCommand(
@@ -386,6 +389,7 @@ export async function activate(context: vscode.ExtensionContext) {
     () => oryPatchOPL({ label: 'opl', description: 'Update the Ory Permission Language file in Ory Network.' }),
     context
   );
+
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
 }
 
