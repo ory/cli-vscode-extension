@@ -22,14 +22,30 @@
           "group": "navigation@1"
         },
         {
+          "command": "ory.projects.patchConfig",
+          "when": "view == listProjects"
+        },
+        {
           "command": "ory.identities.refresh",
           "when": "view == listIdentities",
           "group": "navigation@1"
         },
         {
+          "command": "ory.identities.patchConfig",
+          "when": "view == listIdentities"
+        },
+        {
           "command": "ory.oauth2clients.refresh",
           "when": "view == listOauth2Clients",
           "group": "navigation@1"
+        },
+        {
+          "command": "ory.introspect.token",
+          "when": "view == listOauth2Clients"
+        },
+        {
+          "command": "ory.oauth2clients.patchConfig",
+          "when": "view == listOauth2Clients"
         },
         {
           "command": "ory.relationships.refresh",
@@ -40,6 +56,14 @@
           "command": "ory.tunnel.refresh",
           "when": "view == listRunningProcesses",
           "group": "navigation@1"
+        },
+        {
+          "command": "ory.relationships.patchConfig",
+          "when": "view == listRelationships"
+        },
+        {
+          "command": "ory.relationships.patchOPL",
+          "when": "view == listRelationships"
         }
       ],
       "view/item/context": [
@@ -74,14 +98,44 @@
           "group": "projects_1_general@6"
         },
         {
+          "command": "ory.update.identityConfig",
+          "when": "view == listProjects",
+          "group": "projects_1_general@7"
+        },
+        {
+          "command": "ory.update.oauth2Config",
+          "when": "view == listProjects",
+          "group": "projects_1_general@8" 
+        },
+        {
+          "command": "ory.update.OPL",
+          "when": "view == listProjects",
+          "group": "projects_1_general@9"
+        },
+        {
+          "command": "ory.update.permissionConfig",
+          "when": "view == listProjects",
+          "group": "projects_1_general@10"
+        },
+        {
+          "command": "ory.update.projectConfig",
+          "when": "view == listProjects",
+          "group": "projects_1_general@11"
+        },
+        {
           "command": "ory.get.oauth2Client",
           "when": "view == listOauth2Clients",
-          "group": "oauth2Clients_1_general@1"
+          "group": "oauth2Clients_1_general@2"
         },
         {
           "command": "ory.copy.oauth2ClientID",
           "when": "view == listOauth2Clients",
-          "group": "oauth2Clients_1_general@2"
+          "group": "oauth2Clients_1_general@1"
+        },
+        {
+          "command": "ory.update.oauth2Client",
+          "when": "view == listOauth2Clients",
+          "group": "oauth2Clients_1_general@3"
         },
         {
           "command": "ory.get.identity",
@@ -276,6 +330,62 @@
       {
         "command": "ory.tunnel",
         "title": "Ory: Tunnel"
+      },
+      {
+        "command": "ory.introspect.token",
+        "title": "Ory: Introspect Token"
+      },
+      {
+        "command": "ory.patch",
+        "title": "Ory: Patch"
+      },
+      {
+        "command": "ory.identities.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.oauth2clients.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.projects.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.relationships.patchConfig",
+        "title": "Patch Config"
+      },
+      {
+        "command": "ory.relationships.patchOPL",
+        "title": "Patch OPL"
+      },
+      {
+        "command": "ory.update",
+        "title": "Ory: Update"
+      },
+      {
+        "command": "ory.update.identityConfig",
+        "title": "Update Identity Config"
+      },
+      {
+        "command": "ory.update.oauth2Client",
+        "title": "Update Client"
+      },
+      {
+        "command": "ory.update.oauth2Config",
+        "title": "Update Oauth2 Config"
+      },
+      {
+        "command": "ory.update.OPL",
+        "title": "Update OPL"
+      },
+      {
+        "command": "ory.update.permissionConfig",
+        "title": "Update Permission Config"
+      },
+      {
+        "command": "ory.update.projectConfig",
+        "title": "Update Project Config"
       }
     ]
   },

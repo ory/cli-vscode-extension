@@ -38,8 +38,13 @@ export async function spawnCommonErrAndClose(
       }
       if (data.includes('Error: no project was specified')) {
         vscode.window.showErrorMessage('No project id was specified');
+      } else if (data.includes('Warning')) {
+        vscode.window.showWarningMessage('Warnings were found. Please check in Output → Ory');
+        if (data.includes('Project updated successfully!')) {
+          vscode.window.showInformationMessage('Project updated successfully!');
+        }
       } else {
-        vscode.window.showErrorMessage('Oops 🫢 something went wrong! Please check in Output -> Ory');
+        vscode.window.showErrorMessage('Oops 🫢 something went wrong! Please check in Output → Ory');
       }
     });
 
@@ -79,7 +84,12 @@ export function webViewPanel(viewType: string, title: string, showOptions: vscod
   panel.webview.html = htmlContent;
 }
 
-export async function commandInput(obj: { label: string; description: string; type: string; useLabelPlaceHolder?: boolean; }): Promise<string[]> {
+export async function commandInput(obj: {
+  label: string;
+  description: string;
+  type: string;
+  useLabelPlaceHolder?: boolean;
+}): Promise<string[]> {
   let resultString: string[] = [];
   let input: string | undefined;
   if (obj.type === 'empty') {
@@ -108,4 +118,24 @@ export async function commandInput(obj: { label: string; description: string; ty
   }
 
   return resultString;
+}
+
+export async function fileType(cmd: string): Promise<string> {
+  const formatInput = await vscode.window.showQuickPick(
+    [{ label: 'json', picked: true }, { label: 'yaml/yml' }, { label: 'url' }, { label: 'base64' }],
+    { title: `${cmd} format`, placeHolder: 'Set the output format', ignoreFocusOut: true }
+  );
+  if (formatInput === undefined) {
+    return 'noUploadTypeSelected';
+  }
+  switch (formatInput?.label) {
+    case 'yaml/yml':
+      return 'yaml';
+    case 'url':
+      return 'url';
+    case 'base64':
+      return 'base64';
+    default:
+      return 'json';
+  }
 }
