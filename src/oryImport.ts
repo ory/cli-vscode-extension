@@ -5,23 +5,30 @@ import { spawnCommonErrAndClose, fileType } from './helper';
 import { logger } from './helper/logger';
 
 export async function runOryImport() {
-  const result = await vscode.window.showQuickPick([
+  const result = await vscode.window.showQuickPick(
+    [
+      {
+        label: 'identities',
+        description: 'Import one or more identities from files',
+        type: 'string'
+      },
+      {
+        label: 'jwk',
+        description: 'Imports JSON Web Keys from one or more JSON files.',
+        type: 'string'
+      },
+      {
+        label: 'oauth2-client',
+        description: 'Import one or more OAuth 2.0 Clients from files.',
+        type: 'string'
+      }
+    ],
     {
-      label: 'identities',
-      description: 'Import one or more identities from files',
-      type: 'string'
-    },
-    {
-      label: 'jwk',
-      description: 'Imports JSON Web Keys from one or more JSON files.',
-      type: 'string'
-    },
-    {
-      label: 'oauth2-client',
-      description: 'Import one or more OAuth 2.0 Clients from files.',
-      type: 'string'
+      placeHolder: 'Pick to import...',
+      title: 'Ory Import',
+      ignoreFocusOut: true
     }
-  ]);
+  );
 
   switch (result?.label) {
     case 'identities':
