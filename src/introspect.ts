@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from './extension';
 import { spawnCommonErrAndClose } from './helper';
+import { logger } from './helper/logger';
 
 export async function runOryIntrospect() {
   const result = await vscode.window.showQuickPick(
@@ -130,5 +131,6 @@ export async function runOryIntrospect() {
       selection.command();
     }
   });
+  logger.info(`Ory Introspect Token: ${active}`, 'runOryIntrospect');
   return;
 }

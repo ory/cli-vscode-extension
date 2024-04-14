@@ -1,31 +1,31 @@
 import { exec } from 'child_process';
 import * as vscode from 'vscode';
 import * as os from 'os';
-import { outputChannel } from './extension';
+// import { outputChannel } from './extension';
+import { logger } from './helper/logger';
 
 let alreadyOfferedToInstallOry = false;
 
 export async function offerToInstallOry() {
-  outputChannel.clear();
+  // outputChannel.clear();
   if (alreadyOfferedToInstallOry) {
     vscode.window.showInformationMessage('Ory Cli is already installed.');
+    logger.info('Ory Cli is already installed.', 'offerToInstallOry');
     return;
   }
 
   await runCommand('ory version')
     .then((result) => {
-      console.log(result);
+      logger.debug(result, 'offerToInstallOry');
       alreadyOfferedToInstallOry = true;
     })
     .catch((err) => {
-      console.error(err);
-      outputChannel.appendLine(err);
+      logger.error(err, 'offerToInstallOry');
       const installItem = {
         title: 'Install',
         async command() {
           // Install ory cli
-          console.log('Installing ory');
-          outputChannel.appendLine('Installing Ory Cli...');
+          logger.info('Installing Ory Cli...');
           installOryCli();
         }
       };
@@ -51,13 +51,11 @@ async function installOryCli() {
       await runCommand('brew install ory/tap/cli')
         .then((result) => {
           alreadyOfferedToInstallOry = true;
-          console.log('Ory Cli install successfully. ' + result);
-          outputChannel.appendLine('Ory Cli install successfully. ' + result);
+          logger.info('Ory Cli install successfully. ' + result);
         })
         .catch((err) => {
-          console.error(err);
           let errString = err.message;
-          outputChannel.appendLine(err);
+          logger.error(err, 'installOryCli');
           if (errString.includes('-bash: brew: command not found')) {
             const installItem = {
               title: 'Install Brew',
@@ -66,14 +64,12 @@ async function installOryCli() {
                   '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
                 )
                   .then((result) => {
-                    console.log('Brew install successfully. ' + result);
+                    logger.info('Brew install successfully. ' + result);
                     vscode.window.showInformationMessage('Brew was installed successfully!');
-                    outputChannel.appendLine('Brew was installed successfully!');
                     offerToInstallOry();
                   })
                   .catch((err) => {
-                    console.error(err);
-                    outputChannel.appendLine(err);
+                    logger.error(err, 'installOryCli');
                   });
               }
             };
@@ -99,35 +95,32 @@ async function installOryCli() {
       )
         .then((result) => {
           alreadyOfferedToInstallOry = true;
-          console.log('Ory Cli install successfully');
-          outputChannel.appendLine('Ory Cli install successfully');
+          logger.info('Ory Cli install successfully');
         })
         .catch((err) => {
-          console.error(err);
+          logger.error(err, 'installOryCli');
           var errString = err.message;
           if (errString.includes('ory/ info installed ./ory')) {
             vscode.window.showInformationMessage('Ory Cli was installed successfully!');
+            logger.info('Ory Cli was installed successfully!');
           }
-          outputChannel.appendLine(err);
         });
       break;
     case 'win32':
       await runCommand('scoop bucket add ory https://github.com/ory/scoop.git && scoop install ory')
         .then((result) => {
           alreadyOfferedToInstallOry = true;
-          console.log('Ory Cli install successfully. ' + result);
+          logger.info('Ory Cli install successfully. ' + result);
           let oryVersionMessage = result.split('\n');
           if (oryVersionMessage[oryVersionMessage.length - 1] === '') {
             vscode.window.showInformationMessage(oryVersionMessage[oryVersionMessage.length - 2]);
           } else {
             vscode.window.showInformationMessage('Ory Cli was installed successfully!');
           }
-          outputChannel.appendLine('Ory Cli install successfully');
         })
         .catch((err) => {
-          console.error(err.message);
+          logger.error(err.message);
           var errString = err.message;
-          outputChannel.appendLine(err.message);
           if (errString.includes(`'scoop' is not recognized as an internal or external command`)) {
             const installItem = {
               title: 'Install Scoop',
@@ -136,14 +129,13 @@ async function installOryCli() {
                   'powershell -command "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; irm get.scoop.sh | iex"'
                 )
                   .then((result) => {
-                    console.log('Scoop install successfully. ' + result);
+                    logger.debug('Scoop install successfully. ' + result);
                     vscode.window.showInformationMessage('scoop was installed successfully!');
-                    outputChannel.appendLine('scoop was installed successfully!');
+                    logger.info('scoop was installed successfully!');
                     offerToInstallOry();
                   })
                   .catch((err) => {
-                    console.error(err);
-                    outputChannel.appendLine(err);
+                    logger.error(err);
                   });
               }
             };
@@ -164,8 +156,7 @@ async function installOryCli() {
         });
       break;
     default:
-      console.warn('Not able to recognize the OS!');
-      outputChannel.appendLine('Not able to recognize the OS!');
+      logger.warn('Not able to recognize the OS!');
       break;
   }
 }

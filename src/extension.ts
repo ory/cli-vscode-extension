@@ -14,6 +14,7 @@ import {
   runOryGet
 } from './oryGet';
 import { format } from './helper';
+import { logger } from './helper/logger';
 import { ListProjectsProvider, ProjectsTreeItem } from './tree/listProjects';
 import * as os from 'os';
 import { runOryUse, runOryUseProject } from './oryUse';
@@ -41,7 +42,7 @@ import {
   runOryUpdate
 } from './oryUpdate';
 
-export const outputChannel = vscode.window.createOutputChannel('Ory');
+// export const outputChannel = vscode.window.createOutputChannel('Ory');
 
 export const oryCommand: string = os.platform() === 'win32' ? 'ory.exe' : 'ory';
 // This method is called when your extension is activated
@@ -49,7 +50,7 @@ export const oryCommand: string = os.platform() === 'win32' ? 'ory.exe' : 'ory';
 export async function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "ory" is now active!');
+  logger.info('Congratulations, your extension "ory" is now active!', 'activate');
 
   offerToInstallOry();
   // The command has been defined in the package.json file
@@ -120,18 +121,6 @@ export async function activate(context: vscode.ExtensionContext) {
       if (node !== undefined) {
         vscode.env.clipboard
           .writeText(node.pId)
-          .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
-      }
-    },
-    context
-  );
-  registerCommand(
-    'ory.copy.identityID',
-    async (node?: IdentitiesTreeItem) => {
-      console.log(node?.iId);
-      if (node !== undefined) {
-        vscode.env.clipboard
-          .writeText(node.iId)
           .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
       }
     },
@@ -250,18 +239,6 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   registerCommand('ory.update', () => runOryUpdate(), context);
   registerCommand(
-    'ory.copy.relationshipString',
-    async (node?: RelationshipsTreeItem) => {
-      console.log(node?.relationshipString);
-      if (node !== undefined) {
-        vscode.env.clipboard
-          .writeText(node.relationshipString)
-          .then(() => vscode.window.showInformationMessage('Copied to clipboard!'));
-      }
-    },
-    context
-  );
-  registerCommand(
     'ory.update.identityConfig',
     async (node?: ProjectsTreeItem) => {
       console.log(node?.pId);
@@ -344,7 +321,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   registerCommand('ory.introspect.token', () => runOryIntrospect(), context);
-  
+
   // Patch Command
   registerCommand('ory.patch', () => runOryPatch(), context);
   registerCommand(
@@ -403,11 +380,11 @@ function registerCommand(command: string, callback: (...args: any[]) => any, ctx
 function runOryVersion() {
   exec('ory version', (error: Error | null, stdout: string, stderr: string) => {
     if (error) {
-      console.log(`error: ${error.message}`);
+      logger.error(`error: ${error.message}`, 'ory-version');
       return;
     }
     if (stderr) {
-      console.log(`stderr: ${stderr}`);
+      logger.error(`stderr: ${stderr}`, 'ory-version');
       return;
     }
     vscode.window.showInformationMessage(`${stdout}`, {

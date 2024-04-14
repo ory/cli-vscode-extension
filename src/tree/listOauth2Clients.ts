@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
 import { spawnCommonErrAndClose } from '../helper';
 import { oryDeleteOauth2Client } from '../oryDelete';
+import { logger } from '../helper/logger';
 
 export interface Oauth2Clients {
   clientID: string;
@@ -29,8 +30,10 @@ export class ListOauth2ClientsProvider implements vscode.TreeDataProvider<Oauth2
   }
 
   async init() {
+    logger.info('Fetching Oauth2 Clients...', 'list-oauth2-clients');
     const oauth2Clients = await runOryListOauth2Clients().catch((err) => {
       console.error(err);
+      logger.error(`Error: ${err.message}`, 'list-oauth2-clients');
       return [];
     });
 
@@ -46,12 +49,15 @@ export class ListOauth2ClientsProvider implements vscode.TreeDataProvider<Oauth2
         scope: oauth2.scope
       });
     });
+    logger.info('Fetched Oauth2 Clients', 'list-oauth2-clients');
     this._onDidChangeTreeData.fire();
   }
 
   async refresh() {
+    logger.info('Refreshing Oauth2 Clients...', 'list-oauth2-clients');
     this.topLevelItems = [];
     this.init();
+    logger.info('Refreshed Oauth2 Clients', 'list-oauth2-clients');
     this._onDidChangeTreeData.fire();
   }
 

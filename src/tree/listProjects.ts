@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
 import { spawnCommonErrAndClose } from '../helper';
+import { logger } from '../helper/logger';
 
 export interface Project {
   id: string;
@@ -24,8 +25,10 @@ export class ListProjectsProvider implements vscode.TreeDataProvider<ProjectsTre
   }
 
   async init() {
+    logger.info('Fetching Projects...', 'list-projects');
     const projects = await runOryListProjects().catch((err) => {
       console.error(err);
+      logger.error(`Error: ${err.message}`, 'list-projects');
       return [];
     });
 
@@ -37,12 +40,15 @@ export class ListProjectsProvider implements vscode.TreeDataProvider<ProjectsTre
         name: project.name
       });
     });
+    logger.info('Fetched Projects', 'list-projects');
     this._onDidChangeTreeData.fire();
   }
 
   async refresh() {
+    logger.info('Refreshing Projects...', 'list-projects');
     this.topLevelItems = [];
     this.init();
+    logger.info('Refreshed Projects', 'list-projects');
     this._onDidChangeTreeData.fire();
   }
 

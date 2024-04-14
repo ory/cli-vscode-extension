@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 import * as os from 'os';
 import * as pty from 'node-pty';
 import stripAnsi from 'strip-ansi';
-import { outputChannel } from './extension';
 import { spawn } from 'child_process';
+import { logger } from './helper/logger';
 
 export async function runOryAuth() {
   const virtualEnter = os.platform() === 'win32' ? '\r' : '\n';
@@ -122,9 +122,9 @@ function oryAuthHelper(
   ptyProcess.onData(async (data: any) => {
     data = stripAnsi(data);
     if (!data.includes(passwordInput)) {
-      outputChannel.append(data);
+      logger.debug(data);
     }
-    console.log(data);
+    logger.debug(data);
     // If Totp's setup authentication code input box is prompted
     if (data.includes('Authentication code')) {
       const totpInput = await vscode.window.showInputBox({
@@ -139,6 +139,7 @@ function oryAuthHelper(
 
     // Signed in successfully
     if (data.includes('You are now signed in as: ' + emailInput)) {
+      logger.info('You are now signed in as: ' + emailInput + '🎉');
       vscode.window.showInformationMessage('You are now signed in as: ' + emailInput + '🎉');
     }
 
@@ -160,6 +161,9 @@ function oryAuthHelper(
             selection.command();
           }
         });
+      logger.error(
+        'Your sign in attempt failed. Please try again! The provided credentials are invalid, check for spelling mistakes in your password or username, email address, or phone number.'
+      );
       os.platform() === 'win32' ? ptyProcess.kill() : ptyProcess.kill('1');
     }
 
@@ -167,7 +171,7 @@ function oryAuthHelper(
     if (data.includes('Your account creation attempt failed')) {
       let extractErrMsg = data.split('\n')[1];
       extractErrMsg = extractErrMsg.replace(os.platform() === 'win32' ? '\r' : '\n', '');
-      console.error('error ' + extractErrMsg);
+      logger.error('error ' + extractErrMsg);
 
       const retryRegistration = {
         title: 'Retry',
@@ -184,15 +188,13 @@ function oryAuthHelper(
 
     // Account already exists
     if (data.includes('An account with the same identifier (email, phone, username, ...) exists already')) {
-      console.log('account already exists!');
-      outputChannel.append('account already exists!');
+      logger.info('account already exists!');
     }
   });
 
   // Any Errors
   ptyProcess.onExit((e: any) => {
-    outputChannel.append(e);
-    console.error(e);
+    logger.error(e);
   });
 }
 
@@ -201,18 +203,20 @@ export async function runOryAuthLogout() {
   const ls = spawn(os.platform() === 'win32' ? 'ory.exe' : 'ory', ['auth', 'logout']);
 
   ls.stdout.on('data', (data) => {
-    outputChannel.append('\n' + String(data));
+    logger.debug(`stdout: ${data}`);
     console.log(`stdout: ${data}`);
     vscode.window.showInformationMessage('You signed out successfully ☹️');
+    logger.info('You signed out successfully ☹️');
   });
 
   ls.stderr.on('data', (data) => {
-    outputChannel.append('\n' + String(data));
+    logger.debug(String(data));
     console.error(`stderr: ${data}`);
+    logger.error(`stderr: ${data}`);
   });
 
   ls.on('close', (code) => {
-    outputChannel.append(`\nprocess exited with code ${code}`);
+    logger.debug(`\nprocess exited with code ${code}`);
     console.log(`child process exited with code ${code}`);
   });
 }

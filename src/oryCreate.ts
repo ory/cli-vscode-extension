@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
-import { outputChannel } from './extension';
+import { logger } from './helper/logger';
 import * as os from 'os';
 
 const oryCommand: string = os.platform() === 'win32' ? 'ory.exe' : 'ory';
@@ -56,7 +56,7 @@ export async function runOryCreate() {
       ]);
 
       createJWK.stdout.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug(`stdout: ${String(data)}`);
         console.log(`stdout: ${data}`);
         if (data.includes(`SET ID\tKEY ID`) || data.includes(`${jwkSetInput}`)) {
           const viewDetails = {
@@ -86,11 +86,12 @@ export async function runOryCreate() {
               selection.details();
             }
           });
+          logger.info(`JWK created successfully!`);
         }
       });
 
       createJWK.stderr.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug('stderr:' + String(data), 'createJWK');
         console.error(`stderr: ${data}`);
         if (data.includes('Your session has expired or has otherwise become invalid')) {
           const reAuthenticate = {
@@ -104,12 +105,13 @@ export async function runOryCreate() {
               selection.command();
             }
           });
+          logger.error('Your session has expired or has otherwise become invalid');
           createJWK.kill();
         }
       });
 
       createJWK.on('close', (code) => {
-        outputChannel.append(`\nprocess exited with code ${code}`);
+        logger.debug(`\nprocess exited with code ${code}`, 'createJWK');
         console.log(`child process exited with code ${code}`);
       });
       break;
@@ -128,14 +130,16 @@ export async function runOryCreate() {
           return;
         }
         vscode.window.showInformationMessage('creating oauth2-client with default values.');
+        logger.info('creating oauth2-client with default values.');
         console.log('creating oauth2-client with default values.');
       }
 
       console.log('This oauth2client: ' + oauth2ClientOptions);
+      logger.debug('This oauth2client: ' + oauth2ClientOptions, 'createOauth2Client');
       const createOauth2Client = spawn(oryCommand, ['create', 'oauth2-client', ...oauth2ClientOptions]);
 
       createOauth2Client.stdout.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug('stdout:' + String(data), 'createOauth2Client');
         console.log(`stdout: ${data}`);
         if (data.includes(`CLIENT ID`)) {
           const viewDetails = {
@@ -181,13 +185,15 @@ export async function runOryCreate() {
               selection.details();
             }
           });
+          logger.info(`Oauth2-client created successfully!`);
         }
       });
 
       createOauth2Client.stderr.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug('stderr:' + String(data), 'createOauth2Client');
         console.error(`stderr: ${data}`);
         if (data.includes('Your session has expired or has otherwise become invalid')) {
+          logger.error('Your session has expired or has otherwise become invalid');
           const reAuthenticate = {
             title: 'Re-authenticate',
             command() {
@@ -202,11 +208,12 @@ export async function runOryCreate() {
           createOauth2Client.kill();
         } else {
           vscode.window.showErrorMessage('Opps 🫢 something went wrong! Please check in Output -> Ory');
+          logger.error(data);
         }
       });
 
       createOauth2Client.on('close', (code) => {
-        outputChannel.append(`\nprocess exited with code ${code}`);
+        logger.debug(`\nprocess exited with code ${code}`, 'createOauth2Client');
         console.log(`child process exited with code ${code}`);
       });
       break;
@@ -220,13 +227,14 @@ export async function runOryCreate() {
 
       if (projectNameInput === undefined) {
         vscode.window.showErrorMessage(`Invalid project name ${projectNameInput}`);
+        logger.warn(`Invalid project name ${projectNameInput}`);
         return;
       }
 
       const createProject = spawn(oryCommand, ['create', 'project', '--name', `${projectNameInput}`]);
 
       createProject.stdout.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug('stdout:' + String(data));
         console.log(`stdout: ${data}`);
         if (data.includes(`NAME\t${projectNameInput}`)) {
           const viewDetails = {
@@ -247,11 +255,12 @@ export async function runOryCreate() {
               selection.details();
             }
           });
+          logger.info(`Project created successfully!` + data);
         }
       });
 
       createProject.stderr.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug('stderr:' + String(data), 'createProject');
         console.error(`stderr: ${data}`);
         if (data.includes('Your session has expired or has otherwise become invalid')) {
           const reAuthenticate = {
@@ -265,12 +274,13 @@ export async function runOryCreate() {
               selection.command();
             }
           });
+          logger.error('Your session has expired or has otherwise become invalid');
           createProject.kill();
         }
       });
 
       createProject.on('close', (code) => {
-        outputChannel.append(`\nprocess exited with code ${code}`);
+        logger.debug(`\nprocess exited with code ${code}`, 'createProject');
         console.log(`child process exited with code ${code}`);
       });
 
@@ -286,6 +296,7 @@ export async function runOryCreate() {
 
       if (relationshipConfigFileInput === undefined) {
         vscode.window.showErrorMessage(`Invalid project name ${relationshipConfigFileInput}`);
+        logger.error(`Invalid project name ${relationshipConfigFileInput}`);
         return;
       }
       console.log(relationshipConfigFileInput[0].fsPath);
@@ -296,17 +307,19 @@ export async function runOryCreate() {
       ]);
 
       createRelationships.stdout.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug('stdout:' + String(data), 'createRelationships');
         console.log(`stdout: ${data}`);
         if (data.includes(`NAMESPACE`)) {
           vscode.window.showInformationMessage(`Relationship created successfully!`);
+          logger.info(`Relationship created successfully!` + data);
         }
       });
 
       createRelationships.stderr.on('data', (data) => {
-        outputChannel.append('\n' + String(data));
+        logger.debug('stderr:' + String(data), 'createRelationships');
         console.error(`stderr: ${data}`);
         if (data.includes('Your session has expired or has otherwise become invalid')) {
+          logger.error('Your session has expired or has otherwise become invalid');
           const reAuthenticate = {
             title: 'Re-authenticate',
             command() {
@@ -321,10 +334,11 @@ export async function runOryCreate() {
           createRelationships.kill();
         }
         vscode.window.showErrorMessage('Oops something went wrong!');
+        logger.error(`Something went wrong! ${data}`);
       });
 
       createRelationships.on('close', (code) => {
-        outputChannel.append(`\nprocess exited with code ${code}`);
+        logger.debug(`\nprocess exited with code ${code}`, 'createRelationships');
         console.log(`child process exited with code ${code}`);
       });
       break;
