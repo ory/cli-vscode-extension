@@ -41,6 +41,7 @@ import {
   oryUpdateProjectConfig,
   runOryUpdate
 } from './oryUpdate';
+import { oryImportIdentities, oryImportJWK, oryImportOAuth2Client, runOryImport } from './oryImport';
 
 // export const outputChannel = vscode.window.createOutputChannel('Ory');
 
@@ -367,11 +368,41 @@ export async function activate(context: vscode.ExtensionContext) {
     context
   );
 
+  // Import Command
+  registerCommand('ory.import', () => runOryImport(), context);
+  registerCommand(
+    'ory.import.identities',
+    () =>
+      oryImportIdentities({
+        label: 'identities',
+        description: 'Import one or more identities from files'
+      }),
+    context
+  );
+  registerCommand(
+    'ory.import.jwk',
+    () => {
+      oryImportJWK({
+        label: 'jwk',
+        description: 'Imports JSON Web Keys from one or more JSON files.'
+      });
+    },
+    context
+  );
+  registerCommand(
+    'ory.import.oauth2Client',
+    () =>
+      oryImportOAuth2Client({ label: 'oauth2-client', description: 'Import one or more OAuth 2.0 Clients from files' }),
+    context
+  );
+
   context.subscriptions.push(projectView, identityView, oauth2ClientsView, relationshipsView);
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  logger.info('Extension deactivated', 'deactivate');
+}
 
 function registerCommand(command: string, callback: (...args: any[]) => any, ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(vscode.commands.registerCommand(command, callback));

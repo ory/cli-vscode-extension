@@ -26,6 +26,10 @@
           "when": "view == listProjects"
         },
         {
+          "command": "ory.import.jwk",
+          "when": "view == listProjects"
+        },
+        {
           "command": "ory.identities.refresh",
           "when": "view == listIdentities",
           "group": "navigation@1"
@@ -35,9 +39,17 @@
           "when": "view == listIdentities"
         },
         {
+          "command": "ory.import.identities",
+          "when": "view == listIdentities"
+        },
+        {
           "command": "ory.oauth2clients.refresh",
           "when": "view == listOauth2Clients",
           "group": "navigation@1"
+        },
+        {
+          "command": "ory.import.oauth2Client",
+          "when": "view == listOauth2Clients"
         },
         {
           "command": "ory.introspect.token",
@@ -358,6 +370,22 @@
       {
         "command": "ory.update.projectConfig",
         "title": "Update Project Config"
+      },
+      {
+        "command": "ory.import",
+        "title": "Ory: Import"
+      },
+      {
+        "command": "ory.import.identities",
+        "title": "Import Identities"
+      },
+      {
+        "command": "ory.import.jwk",
+        "title": "Import JWK"
+      },
+      {
+        "command": "ory.import.oauth2Client",
+        "title": "Import Client"
       }
     ]
   },
