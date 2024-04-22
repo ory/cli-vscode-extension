@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { ChildProcessWithoutNullStreams } from 'child_process';
-import { outputChannel } from '../extension';
+import { logger } from './logger';
 
 export async function spawnCommonErrAndClose(
   spawnObj: ChildProcessWithoutNullStreams,
@@ -10,7 +10,7 @@ export async function spawnCommonErrAndClose(
   return new Promise((resolve, reject) => {
     let cmdOutput: string = '';
     spawnObj.stdout.on('data', (data) => {
-      outputChannel.append('\n' + String(data));
+      logger.debug('stdout:' + String(data));
       console.log(`stdout: ${data}`);
       if (format !== '' && format !== undefined) {
         let jsonOrYamlExt: string = format?.includes('json') ? 'json' : 'yaml';
@@ -20,7 +20,7 @@ export async function spawnCommonErrAndClose(
     });
 
     spawnObj.stderr.on('data', (data) => {
-      outputChannel.append('\nError: ' + String(data));
+      logger.debug('Error: ' + String(data));
       console.error(`stderr: ${data}`);
       if (data.includes('Your session has expired or has otherwise become invalid')) {
         const reAuthenticate = {
@@ -34,22 +34,27 @@ export async function spawnCommonErrAndClose(
             selection.command();
           }
         });
+        logger.error('Your session has expired or has otherwise become invalid');
         spawnObj.kill();
       }
       if (data.includes('Error: no project was specified')) {
         vscode.window.showErrorMessage('No project id was specified');
+        logger.error('No project id was specified');
       } else if (data.includes('Warning')) {
         vscode.window.showWarningMessage('Warnings were found. Please check in Output → Ory');
+        logger.warn(data);
         if (data.includes('Project updated successfully!')) {
           vscode.window.showInformationMessage('Project updated successfully!');
+          logger.info('Project updated successfully!');
         }
       } else {
         vscode.window.showErrorMessage('Oops 🫢 something went wrong! Please check in Output → Ory');
+        logger.error(`Something went wrong! ${data}`);
       }
     });
 
     spawnObj.on('close', (code) => {
-      outputChannel.append(`\nprocess exited with code ${code}`);
+      logger.debug(`process exited with code ${code}`, componentName);
       console.log(`child process exited with code ${code}`);
       resolve(cmdOutput.trim());
     });

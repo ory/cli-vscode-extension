@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
-import { outputChannel, oryCommand } from './extension';
+import { oryCommand } from './extension';
+import { logger } from './helper/logger';
 import { format, spawnCommonErrAndClose, commandInput } from './helper';
 
 export async function runOryGet() {
@@ -26,7 +27,7 @@ export async function runOryGet() {
         identityOutputFormat = await format('identity');
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'get-identity');
         return;
       }
 
@@ -43,7 +44,7 @@ export async function runOryGet() {
         identityConfigOutputFormat = await format('identity-config');
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'get-identity-config');
         return;
       }
 
@@ -60,7 +61,7 @@ export async function runOryGet() {
         jwkConfigOutputFormat = await format('jwk');
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'get-jwk');
         return;
       }
 
@@ -77,7 +78,7 @@ export async function runOryGet() {
         oauth2ClientOutputFormat = await format('oauth2-client');
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'get-oauth2-client');
         return;
       }
 
@@ -94,7 +95,7 @@ export async function runOryGet() {
         oauth2ConfigOutputFormat = await format('oauth2-config');
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'get-oauth2-config');
         return;
       }
 
@@ -111,7 +112,7 @@ export async function runOryGet() {
         permissionConfigOutputFormat = await format('permission-config');
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'get-permission-config');
         return;
       }
 
@@ -128,7 +129,7 @@ export async function runOryGet() {
         projectOutputFormat = await format('project');
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'get-project');
         return;
       }
 

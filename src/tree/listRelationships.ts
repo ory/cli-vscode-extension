@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
 import { spawnCommonErrAndClose } from '../helper';
+import { logger } from '../helper/logger';
 
 interface TreeOutputPermission {
   subject: string;
@@ -23,13 +24,16 @@ export class ListRelationshipsProvider implements vscode.TreeDataProvider<Relati
   }
 
   async init() {
+    logger.info('Fetching Relationships...', 'list-relationships');
     const relationships = await runOryListRelationships().catch((err) => {
       console.error(err);
+      logger.error(`Error: ${err.message}`, 'list-relationships');
       return [];
     });
 
     const treeViewDataObj = this.buildRelationshipsJSON(relationships.relation_tuples);
     this.subjects = treeViewDataObj;
+    logger.info('Fetched Relationships', 'list-relationships');
     this._onDidChangeTreeData.fire();
   }
 
@@ -57,12 +61,15 @@ export class ListRelationshipsProvider implements vscode.TreeDataProvider<Relati
   }
 
   refresh(): void {
+    logger.info('Refreshing Relationships...', 'list-relationships');
     this.subjects = {};
     this.init();
+    logger.info('Refreshed Relationships', 'list-relationships');
     this._onDidChangeTreeData.fire();
   }
 
   private buildRelationshipsJSON(respJson: any): Record<string, Record<string, string[]>> {
+    logger.info('Building Relationships JSON', 'list-relationships');
     const topLevelList: TreeOutputPermission[] = [];
     // Builds the relationship strings
     respJson.forEach(function (value: any) {

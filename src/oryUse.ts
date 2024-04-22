@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
-import { outputChannel, oryCommand } from './extension';
+import { oryCommand } from './extension';
 import { runOryListProjects } from './tree/listProjects';
 import { spawnCommonErrAndClose } from './helper';
+import { logger } from './helper/logger';
 
 export async function runOryUse() {
   let projectsList: { label: string; description: string }[] = [];
@@ -20,7 +21,7 @@ export async function runOryUse() {
   if (result !== undefined) {
     runOryUseProject(result?.description, result?.label);
   } else {
-    outputChannel.append('Use Project invalid option.');
+    logger.error('Use Project invalid option.');
   }
 }
 
@@ -30,6 +31,7 @@ export async function runOryUseProject(projectId: string, projectName?: string) 
   await spawnCommonErrAndClose(useProject, 'useProject').then((value) => {
     if (value.includes('ID')) {
       vscode.window.showInformationMessage(`Using Project: ${projectName}`);
+      logger.info(`Using Project: ${projectName}`);
     }
   });
 }

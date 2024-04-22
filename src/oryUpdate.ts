@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
-import { outputChannel, oryCommand } from './extension';
+import { oryCommand } from './extension';
 import { spawnCommonErrAndClose, fileType } from './helper';
 import { oauth2Client } from './oryCreate';
+import { logger } from './helper/logger';
 
 export async function runOryUpdate() {
   const result = await vscode.window.showQuickPick(
@@ -189,6 +190,7 @@ async function configUpdater(name: string, subCmdName: string, projectId: string
   // select file type json, yml, url or base64://json
   const fileTypeInput = await fileType(`${name} Config`);
   if (fileTypeInput === 'noUploadTypeSelected') {
+    logger.error('No file type selected');
     return;
   }
 
@@ -199,6 +201,7 @@ async function configUpdater(name: string, subCmdName: string, projectId: string
     });
 
     if (fileLocation === undefined) {
+      logger.error('No file selected');
       return;
     }
 
@@ -220,6 +223,7 @@ async function configUpdater(name: string, subCmdName: string, projectId: string
   const configURL = await getInputBox(`Ory Update ${name} Config`, `Enter ${base64OrURLPrefix}`);
 
   if (configURL === undefined) {
+    logger.error('No config url provided');
     return;
   }
   const updateConfig = spawn(oryCommand, ['update', `${subCmdName}`, projectId[0], '--file', configURL, ...optFlags]);
@@ -272,7 +276,7 @@ export async function commandInput(obj: {
 
   if (input === undefined) {
     // throw new Error('Invalid input');
-    outputChannel.append('Invalid Input');
+    logger.error('Invalid Input');
     return [];
   }
 

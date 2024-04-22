@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { oryCommand } from './extension';
 import { spawnCommonErrAndClose, fileType } from './helper';
+import { logger } from './helper/logger';
 
 export async function runOryPatch() {
   const result = await vscode.window.showQuickPick([
@@ -173,10 +174,12 @@ async function commandInput(result: vscode.QuickPickItem) {
     if (option.label === 'file') {
       const fileTypeInput = await fileType(`Ory Patch ${result.label}`);
       if (fileTypeInput === 'noUploadTypeSelected') {
+        logger.error('No file type selected');
         return;
       }
 
       if (fileTypeInput === 'yaml/yml' || fileTypeInput === 'json') {
+        logger.debug(`File type: ${fileTypeInput}`);
         const fileLocation = await vscode.window.showOpenDialog({
           title: `Ory Patch ${result.label}`,
           filters: {
@@ -192,6 +195,7 @@ async function commandInput(result: vscode.QuickPickItem) {
         flagDataJson[option.label] = `${fileLocation[0].fsPath}`;
       } else {
         // take input for base64 and url
+        logger.debug(`File type: ${fileTypeInput}`);
         const base64OrURLPrefix = fileTypeInput === 'url' ? 'https://example.org/config.yaml' : 'base64://<json>';
         const configURL = await vscode.window.showInputBox({
           title: `Ory Patch ${result.label}`,

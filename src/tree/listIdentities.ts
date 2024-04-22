@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 import { oryCommand } from '../extension';
 import { spawnCommonErrAndClose } from '../helper';
 import { oryDeleteIdentity } from '../oryDelete';
+import { logger } from '../helper/logger';
 
 export interface Identity {
   id: string;
@@ -26,8 +27,10 @@ export class ListIdentitiesProvider implements vscode.TreeDataProvider<Identitie
   }
 
   async init() {
+    logger.info('Fetching Identities...', 'list-identities');
     const identities = await runOryListIdentities().catch((err) => {
       console.error(err);
+      logger.error(`Error: ${err.message}`, 'list-identities');
       return [];
     });
 
@@ -42,12 +45,15 @@ export class ListIdentitiesProvider implements vscode.TreeDataProvider<Identitie
         traits: traitValue
       });
     });
+    logger.info('Fetched Identities', 'list-identities');
     this._onDidChangeTreeData.fire();
   }
 
   async refresh() {
+    logger.info('Refreshing Identities...', 'list-identities');
     this.topLevelItems = [];
     this.init();
+    logger.info('Refreshed Identities', 'list-identities');
     this._onDidChangeTreeData.fire();
   }
 

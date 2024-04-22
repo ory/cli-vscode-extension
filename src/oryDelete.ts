@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
-import { outputChannel, oryCommand } from './extension';
+import { oryCommand } from './extension';
+import { logger } from './helper/logger';
 import { spawnCommonErrAndClose, commandInput } from './helper';
 
 export async function runOryDelete() {
@@ -22,7 +23,7 @@ export async function runOryDelete() {
         console.log(identityDeleteCmdOutput);
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'delete-identity');
         return;
       }
 
@@ -37,7 +38,7 @@ export async function runOryDelete() {
         console.log(accessTokenCmdOutput);
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'delete-access-tokens');
         return;
       }
 
@@ -52,7 +53,7 @@ export async function runOryDelete() {
         console.log(jwkCmdOutput);
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'delete-jwk');
         return;
       }
 
@@ -67,7 +68,7 @@ export async function runOryDelete() {
         console.log(oauth2ClientCmdOutput);
       } catch (err: any) {
         console.error(`[${result?.label}] Error: ${err.message}`);
-        outputChannel.append(`[${result?.label}] Error: ${err.message}`);
+        logger.error(`Error: ${err.message}`, 'delete-oauth2-client');
         return;
       }
 
@@ -192,6 +193,7 @@ export async function oryDeleteRelationships() {
       })
       .catch((e) => {
         console.log('from relationships err: ', e);
+        logger.error(`Error: ${e.message}`, 'delete-relationships');
         errorBool = true;
         return;
       });
@@ -232,6 +234,7 @@ export async function oryDeleteRelationships() {
         selection.details();
       }
     });
+    logger.warn(warnData[0] + ' ' + warnData[1]);
   }
   console.log(rsp);
 }
