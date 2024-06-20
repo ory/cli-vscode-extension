@@ -22,11 +22,11 @@ After installing the extension, you can access its features from the Command Pal
 ## Extension Settings
 This extension contributes the following settings:
 
-`ory.activate`: Activates the Ory extension.
-`ory.projects.refresh`: Refreshes the list of Ory projects.
-`ory.projects.patchConfig`: Patches the configuration of an Ory project.
-`ory.import.jwk`: Imports a JSON Web Key (JWK) into an Ory project.
-`ory.identities.refresh`: Refreshes the list of identities in an Ory project.
+- `ory.activate`: Activates the Ory extension 
+- `ory.projects.refresh`: Refreshes the list of Ory projects 
+- `ory.projects.patchConfig`: Patches the configuration of an Ory project 
+- `ory.import.jwk`: Imports a JSON Web Key (JWK) into an Ory project 
+- `ory.identities.refresh`: Refreshes the list of identities in an Ory project
 
 
 ## Known Issues
