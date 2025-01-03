@@ -1,5 +1,5 @@
 {
-  "name": "ory",
+  "name": "@ory/cli-vscode-extension",
   "displayName": "ory",
   "license": "Apache-2.0",
   "description": "This extension enables Visual Studio Code to use the Ory CLI to interact with your Ory projects and services.",
